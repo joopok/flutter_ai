@@ -3,8 +3,12 @@ import 'package:go_router/go_router.dart';
 import '../components/account_list_bottom_sheet.dart';
 import 'package:intl/intl.dart';
 import '../components/custom_bottom_navigation_bar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart';
+import '../screens/login_screen.dart';
 
-class MyHomePage extends StatefulWidget {
+
+class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key});
 
   String formatWon(String amount) {
@@ -13,10 +17,10 @@ class MyHomePage extends StatefulWidget {
   }
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends ConsumerState<MyHomePage> {
   final PageController _pageController = PageController(viewportFraction: 0.9);
   int _currentPage = 0;
   bool _isAmountVisible = true;
@@ -257,15 +261,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
+    // 로그인되지 않은 상태라면 로그인 화면으로 이동
+    if (!authState.isAuthenticated) {
+      return const LoginScreen();
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: const Row(
+        title: Row(
           children: [
-            Text(
+            const Text(
               '도승현님!',
               style: TextStyle(
                 fontSize: 24,
@@ -298,13 +309,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          CircleAvatar(
+                          const CircleAvatar(
                             radius: 50,
                             backgroundImage: NetworkImage(
                                 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'),
                           ),
                           const SizedBox(height: 16),
-                          Text(
+                          const Text(
                             "홍길동",
                             style: TextStyle(
                               fontSize: 20,
@@ -332,7 +343,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                 ),
                                 onPressed: () {
-                                  print("프로필 편집 클릭됨");
+                                  debugPrint("프로필 편집 클릭됨");
                                 },
                                 child: const Text("편집"),
                               ),
@@ -409,8 +420,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            DrawerHeader(
-              decoration: const BoxDecoration(
+            const DrawerHeader(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -421,16 +432,29 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: AssetImage('assets/profile_image.jpg'),
+                    backgroundImage: NetworkImage('https://cdn-icons-png.flaticon.com/512/3135/3135715.png'),
                   ),
-                  const SizedBox(width: 16),
-                  const Text(
-                    'User Name',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  SizedBox(width: 16),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '도승현님',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'test@example.com',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -454,6 +478,42 @@ class _MyHomePageState extends State<MyHomePage> {
               title: const Text('앱 정보'),
               onTap: () {
                 Navigator.pop(context);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text(
+                '로그아웃',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('로그아웃'),
+                    content: const Text('정말 로그아웃 하시겠습니까?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('취소'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          ref.read(authProvider.notifier).logout();
+                          context.go('/login');
+                        },
+                        child: const Text(
+                          '로그아웃',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
           ],

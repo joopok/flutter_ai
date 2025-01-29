@@ -31,8 +31,10 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back, color: Colors.black87),
             onPressed: () => context.go('/'),
           ),
           title: const Text(
@@ -40,27 +42,43 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
+              color: Colors.black87,
             ),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.menu),
+              icon: const Icon(Icons.menu, color: Colors.black87),
               onPressed: () {},
             ),
           ],
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(text: '혜택·이벤트'),
-              Tab(text: '생활편의'),
-            ],
-            labelStyle: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(48),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.black12,
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(text: '혜택·이벤트'),
+                  Tab(text: '생활편의'),
+                ],
+                labelStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                indicatorColor: Colors.black87,
+                labelColor: Colors.black87,
+                unselectedLabelColor: Colors.grey,
+                indicatorWeight: 2,
+              ),
             ),
-            indicatorColor: Colors.black,
-            labelColor: Colors.black,
-            unselectedLabelColor: Colors.grey,
           ),
         ),
         body: TabBarView(

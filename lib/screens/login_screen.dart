@@ -2,34 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
-import 'home.dart';
 
-class LoginScreen extends ConsumerWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
-    final TextEditingController idController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
 
-    // 로그인 성공시 홈 화면으로 이동
-    ref.listen(authProvider, (previous, next) {
-      if (next.isAuthenticated) {
-        if (context.mounted) {
-          context.go('/home');
-        } else {
-          print('context is not mounted');
-        }
-      }
-    });
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final _idController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _idController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
+    // 이미 로그인된 상태라면 홈 화면으로 이동
+    if (authState.isAuthenticated) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/');
+      });
+      return const SizedBox.shrink();
+    }
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(  // 키보드가 올라올 때 화면 스크롤 가능하도록
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Form(
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -47,11 +57,14 @@ class LoginScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 60),
                 // 입력 폼
-                TextField(
-                  controller: idController,
+                TextFormField(
+                  controller: _idController,
                   enabled: !authState.isLoading,
-                  keyboardType: TextInputType.emailAddress,
+                  autofocus: true,
+                  keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
+                  textCapitalization: TextCapitalization.none,
+                  autocorrect: false,
                   decoration: InputDecoration(
                     hintText: '사용자 ID',
                     hintStyle: TextStyle(color: Colors.grey[400]),
@@ -66,10 +79,16 @@ class LoginScreen extends ConsumerWidget {
                       vertical: 16,
                     ),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '사용자 ID를 입력해주세요';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
-                TextField(
-                  controller: passwordController,
+                TextFormField(
+                  controller: _passwordController,
                   enabled: !authState.isLoading,
                   obscureText: true,
                   decoration: InputDecoration(
@@ -86,6 +105,15 @@ class LoginScreen extends ConsumerWidget {
                       vertical: 16,
                     ),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '비밀번호를 입력해주세요';
+                    }
+                    if (value.length < 4) {
+                      return '비밀번호는 최소 4자 이상이어야 합니다';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 24),
                 if (authState.errorMessage != null)
@@ -104,38 +132,13 @@ class LoginScreen extends ConsumerWidget {
                 ElevatedButton(
                   onPressed: authState.isLoading
                       ? null
-                      : () {
-                          if (idController.text.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('사용자 ID를 입력하세요.'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
+                      : () async {
+                          if (_formKey.currentState!.validate()) {
+                            await ref.read(authProvider.notifier).login(
+                                  _idController.text,
+                                  _passwordController.text,
+                                );
                           }
-                          if (passwordController.text.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('비밀번호를 입력하세요.'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
-                          if (passwordController.text.length < 4) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('비밀번호는 최소 4자 이상입니다.'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
-                          ref.read(authProvider.notifier).login(
-                                idController.text,
-                                passwordController.text,
-                              );
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue[700],
@@ -146,8 +149,8 @@ class LoginScreen extends ConsumerWidget {
                   ),
                   child: authState.isLoading
                       ? const SizedBox(
-                          height: 20,
                           width: 20,
+                          height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             valueColor:
@@ -218,4 +221,4 @@ class LoginScreen extends ConsumerWidget {
       ),
     );
   }
-} 
+}

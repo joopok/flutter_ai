@@ -15,10 +15,192 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
+mixin _$UserData {
+  String get id => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String? get email => throw _privateConstructorUsedError;
+  String? get profileImage => throw _privateConstructorUsedError;
+
+  /// Create a copy of UserData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $UserDataCopyWith<UserData> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $UserDataCopyWith<$Res> {
+  factory $UserDataCopyWith(UserData value, $Res Function(UserData) then) =
+      _$UserDataCopyWithImpl<$Res, UserData>;
+  @useResult
+  $Res call({String id, String name, String? email, String? profileImage});
+}
+
+/// @nodoc
+class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
+    implements $UserDataCopyWith<$Res> {
+  _$UserDataCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of UserData
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? email = freezed,
+    Object? profileImage = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
+      profileImage: freezed == profileImage
+          ? _value.profileImage
+          : profileImage // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$UserDataImplCopyWith<$Res>
+    implements $UserDataCopyWith<$Res> {
+  factory _$$UserDataImplCopyWith(
+          _$UserDataImpl value, $Res Function(_$UserDataImpl) then) =
+      __$$UserDataImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String id, String name, String? email, String? profileImage});
+}
+
+/// @nodoc
+class __$$UserDataImplCopyWithImpl<$Res>
+    extends _$UserDataCopyWithImpl<$Res, _$UserDataImpl>
+    implements _$$UserDataImplCopyWith<$Res> {
+  __$$UserDataImplCopyWithImpl(
+      _$UserDataImpl _value, $Res Function(_$UserDataImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of UserData
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? email = freezed,
+    Object? profileImage = freezed,
+  }) {
+    return _then(_$UserDataImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
+      profileImage: freezed == profileImage
+          ? _value.profileImage
+          : profileImage // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$UserDataImpl implements _UserData {
+  const _$UserDataImpl(
+      {required this.id, required this.name, this.email, this.profileImage});
+
+  @override
+  final String id;
+  @override
+  final String name;
+  @override
+  final String? email;
+  @override
+  final String? profileImage;
+
+  @override
+  String toString() {
+    return 'UserData(id: $id, name: $name, email: $email, profileImage: $profileImage)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UserDataImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.email, email) || other.email == email) &&
+            (identical(other.profileImage, profileImage) ||
+                other.profileImage == profileImage));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name, email, profileImage);
+
+  /// Create a copy of UserData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UserDataImplCopyWith<_$UserDataImpl> get copyWith =>
+      __$$UserDataImplCopyWithImpl<_$UserDataImpl>(this, _$identity);
+}
+
+abstract class _UserData implements UserData {
+  const factory _UserData(
+      {required final String id,
+      required final String name,
+      final String? email,
+      final String? profileImage}) = _$UserDataImpl;
+
+  @override
+  String get id;
+  @override
+  String get name;
+  @override
+  String? get email;
+  @override
+  String? get profileImage;
+
+  /// Create a copy of UserData
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$UserDataImplCopyWith<_$UserDataImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
 mixin _$AuthState {
   bool get isLoading => throw _privateConstructorUsedError;
   bool get isAuthenticated => throw _privateConstructorUsedError;
   bool get isAmountVisible => throw _privateConstructorUsedError;
+  UserData? get userData => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of AuthState
@@ -37,7 +219,10 @@ abstract class $AuthStateCopyWith<$Res> {
       {bool isLoading,
       bool isAuthenticated,
       bool isAmountVisible,
+      UserData? userData,
       String? errorMessage});
+
+  $UserDataCopyWith<$Res>? get userData;
 }
 
 /// @nodoc
@@ -58,6 +243,7 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
     Object? isLoading = null,
     Object? isAuthenticated = null,
     Object? isAmountVisible = null,
+    Object? userData = freezed,
     Object? errorMessage = freezed,
   }) {
     return _then(_value.copyWith(
@@ -73,11 +259,29 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
           ? _value.isAmountVisible
           : isAmountVisible // ignore: cast_nullable_to_non_nullable
               as bool,
+      userData: freezed == userData
+          ? _value.userData
+          : userData // ignore: cast_nullable_to_non_nullable
+              as UserData?,
       errorMessage: freezed == errorMessage
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
+  }
+
+  /// Create a copy of AuthState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserDataCopyWith<$Res>? get userData {
+    if (_value.userData == null) {
+      return null;
+    }
+
+    return $UserDataCopyWith<$Res>(_value.userData!, (value) {
+      return _then(_value.copyWith(userData: value) as $Val);
+    });
   }
 }
 
@@ -93,7 +297,11 @@ abstract class _$$AuthStateImplCopyWith<$Res>
       {bool isLoading,
       bool isAuthenticated,
       bool isAmountVisible,
+      UserData? userData,
       String? errorMessage});
+
+  @override
+  $UserDataCopyWith<$Res>? get userData;
 }
 
 /// @nodoc
@@ -112,6 +320,7 @@ class __$$AuthStateImplCopyWithImpl<$Res>
     Object? isLoading = null,
     Object? isAuthenticated = null,
     Object? isAmountVisible = null,
+    Object? userData = freezed,
     Object? errorMessage = freezed,
   }) {
     return _then(_$AuthStateImpl(
@@ -127,6 +336,10 @@ class __$$AuthStateImplCopyWithImpl<$Res>
           ? _value.isAmountVisible
           : isAmountVisible // ignore: cast_nullable_to_non_nullable
               as bool,
+      userData: freezed == userData
+          ? _value.userData
+          : userData // ignore: cast_nullable_to_non_nullable
+              as UserData?,
       errorMessage: freezed == errorMessage
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -142,6 +355,7 @@ class _$AuthStateImpl implements _AuthState {
       {this.isLoading = false,
       this.isAuthenticated = false,
       this.isAmountVisible = true,
+      this.userData,
       this.errorMessage});
 
   @override
@@ -154,11 +368,13 @@ class _$AuthStateImpl implements _AuthState {
   @JsonKey()
   final bool isAmountVisible;
   @override
+  final UserData? userData;
+  @override
   final String? errorMessage;
 
   @override
   String toString() {
-    return 'AuthState(isLoading: $isLoading, isAuthenticated: $isAuthenticated, isAmountVisible: $isAmountVisible, errorMessage: $errorMessage)';
+    return 'AuthState(isLoading: $isLoading, isAuthenticated: $isAuthenticated, isAmountVisible: $isAmountVisible, userData: $userData, errorMessage: $errorMessage)';
   }
 
   @override
@@ -172,13 +388,15 @@ class _$AuthStateImpl implements _AuthState {
                 other.isAuthenticated == isAuthenticated) &&
             (identical(other.isAmountVisible, isAmountVisible) ||
                 other.isAmountVisible == isAmountVisible) &&
+            (identical(other.userData, userData) ||
+                other.userData == userData) &&
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, isLoading, isAuthenticated, isAmountVisible, errorMessage);
+  int get hashCode => Object.hash(runtimeType, isLoading, isAuthenticated,
+      isAmountVisible, userData, errorMessage);
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
@@ -194,6 +412,7 @@ abstract class _AuthState implements AuthState {
       {final bool isLoading,
       final bool isAuthenticated,
       final bool isAmountVisible,
+      final UserData? userData,
       final String? errorMessage}) = _$AuthStateImpl;
 
   @override
@@ -202,6 +421,8 @@ abstract class _AuthState implements AuthState {
   bool get isAuthenticated;
   @override
   bool get isAmountVisible;
+  @override
+  UserData? get userData;
   @override
   String? get errorMessage;
 
