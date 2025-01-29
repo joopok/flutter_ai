@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../screens/login_screen.dart';
 import '../screens/home.dart';
 import '../screens/product.dart';
 import '../screens/asset.dart';
@@ -15,35 +12,21 @@ import '../screens/event_screen.dart';
 import '../screens/workplace_screen.dart';
 import '../screens/esports_screen.dart';
 import '../screens/teen_screen.dart';
-import '../providers/auth_provider.dart';
 
 final router = GoRouter(
-  initialLocation: '/',
-  redirect: (context, state) {
-    final authState = context.read(authProvider);
-    final isLoggedIn = authState.isAuthenticated;
-    if (!isLoggedIn && state.location != '/login') {
-      return '/login';
-    }
-    if (isLoggedIn && state.location == '/login') {
-      return '/home';
-    }
-    return null;
-  },
+  initialLocation: '/splash',
   routes: [
-    GoRoute(
-      path: '/login',
-      name: 'login',
-      builder: (context, state) => const LoginScreen(),
-    ),
-    GoRoute(
-      path: '/home',
-      name: 'home',
-      builder: (context, state) => const Home(),
-    ),
     GoRoute(
       path: '/splash',
       builder: (context, state) => const SplashScreen(),
+    ),
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const MyHomePage(),
+    ),
+    GoRoute(
+      path: '/home',
+      builder: (context, state) => const MyHomePage(),
     ),
     GoRoute(
       path: '/product',
@@ -90,9 +73,4 @@ final router = GoRouter(
       builder: (context, state) => const TeenScreen(),
     ),
   ],
-  errorBuilder: (context, state) => Scaffold(
-    body: Center(
-      child: Text('페이지를 찾을 수 없습니다'),
-    ),
-  ),
 );
