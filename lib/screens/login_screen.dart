@@ -31,7 +31,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.go('/');
       });
-      return const SizedBox.shrink();
     }
 
     return Scaffold(

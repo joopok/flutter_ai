@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 part 'auth_provider.freezed.dart';
 
@@ -50,63 +51,102 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final Ref ref;
 
   Future<void> _loadAuthState() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
-    final userId = prefs.getString('userId');
-    final userName = prefs.getString('userName');
+    try {
+      final sharedPreferences = await SharedPreferences.getInstance();
+      final isAuthenticated = sharedPreferences.getBool('isAuthenticated') ?? false;
+      final userId = sharedPreferences.getString('userId');
+      final userName = sharedPreferences.getString('userName');
 
-    if (isAuthenticated && userId != null && userName != null) {
-      state = state.copyWith(
-        isAuthenticated: true,
-        userData: UserData(
-          id: userId,
-          name: userName,
-          email: prefs.getString('userEmail'),
-          profileImage: prefs.getString('userProfileImage'),
-        ),
-      );
+      if (isAuthenticated && userId != null && userName != null) {
+        state = state.copyWith(
+          isAuthenticated: true,
+          userData: UserData(
+            id: userId,
+            name: userName,
+            email: sharedPreferences.getString('userEmail'),
+            profileImage: sharedPreferences.getString('userProfileImage'),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error loading auth state: $e');
+      await logout();
     }
   }
 
-  Future<void> login(String id, String password) async {
+  Future<bool> login(String id, String password) async {
+    if (id.isEmpty || password.isEmpty) {
+      state = state.copyWith(
+        errorMessage: '아이디와 비밀번호를 입력해주세요.',
+        isLoading: false,
+        isAuthenticated: false,
+      );
+      return false;
+    }
+
     state = state.copyWith(isLoading: true, errorMessage: null);
     
     try {
-      // TODO: 실제 로그인 API 호출 구현
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(milliseconds: 500));
       
       if (id == 'test' && password == 'test123') {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isAuthenticated', true);
-        await prefs.setString('userId', id);
-        await prefs.setString('userName', '도승현');
+        final userData = UserData(
+          id: id,
+          name: '도승현',
+          email: 'test@example.com',
+          profileImage: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+        );
+
+        final sharedPreferences = await SharedPreferences.getInstance();
+        await Future.wait([
+          sharedPreferences.setBool('isAuthenticated', true),
+          sharedPreferences.setString('userId', userData.id),
+          sharedPreferences.setString('userName', userData.name),
+          if (userData.email != null) 
+            sharedPreferences.setString('userEmail', userData.email!),
+          if (userData.profileImage != null) 
+            sharedPreferences.setString('userProfileImage', userData.profileImage!),
+        ]);
 
         state = state.copyWith(
           isLoading: false,
           isAuthenticated: true,
-          userData: UserData(
-            id: id,
-            name: '도승현',
-            email: 'test@example.com',
-            profileImage: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-          ),
+          errorMessage: null,
+          userData: userData,
         );
+
+        return true;
       } else {
+        await _clearAuthData();
         throw Exception('아이디 또는 비밀번호가 올바르지 않습니다.');
       }
     } catch (e) {
+      await _clearAuthData();
       state = state.copyWith(
         isLoading: false,
-        errorMessage: e.toString(),
+        isAuthenticated: false,
+        errorMessage: e.toString().replaceAll('Exception: ', ''),
+        userData: null,
       );
+      return false;
     }
   }
 
+  Future<void> _clearAuthData() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.clear();
+  }
+
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    
-    state = const AuthState();
+    state = state.copyWith(isLoading: true);
+    try {
+      final sharedPreferences = await SharedPreferences.getInstance();
+      await sharedPreferences.clear();
+      state = const AuthState();
+    } catch (e) {
+      debugPrint('Error during logout: $e');
+      state = const AuthState();
+    }
   }
 
   // 금액 표시 여부 토글

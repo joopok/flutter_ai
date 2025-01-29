@@ -24,7 +24,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   final PageController _pageController = PageController(viewportFraction: 0.9);
   int _currentPage = 0;
   bool _isAmountVisible = true;
-  bool _isRefreshing = false;
   bool _isLoading = false;
 
   void _toggleAmountVisibility() {
@@ -34,223 +33,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 
   Future<void> _refreshData() async {
-    setState(() {
-      _isRefreshing = true;
-    });
     await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      _isRefreshing = false;
-    });
-  }
-
-  void _showAccountDetail(
-      BuildContext context, String title, String accountNumber, String amount) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.9,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 8),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(height: 1),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      accountNumber,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '"${widget.formatWon(amount)}"',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(height: 1),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: 10,
-                  separatorBuilder: (context, index) =>
-                      const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(
-                        '거래내역 ${index + 1}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      subtitle: Text(
-                        '"${DateTime.now().subtract(Duration(days: index)).toString().split(' ')[0]}"',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      trailing: Text(
-                        '-${(index + 1) * 10000}원',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.red,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildAccountItem(String title, String accountNumber, String amount,
-      Color backgroundColor) {
-    return GestureDetector(
-      onTap: () => _showAccountDetail(context, title, accountNumber, amount),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black54,
-                  ),
-                ),
-                PopupMenuButton(
-                  icon: const Icon(Icons.more_horiz),
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'copy',
-                      child: Text('계좌번호 복사'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'share',
-                      child: Text('공유하기'),
-                    ),
-                  ],
-                  onSelected: (value) {
-                    if (value == 'copy') {
-                      // 계좌번호 복사 기능
-                    } else if (value == 'share') {
-                      // 공유하기 기능
-                    }
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Text(
-                  _isAmountVisible ? "${amount}원" : '******',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  accountNumber,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showAccountList(BuildContext context) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    await Future.delayed(const Duration(seconds: 1));
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (!mounted) return;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return AccountListBottomSheet(
-          isAmountVisible: _isAmountVisible,
-          onToggleAmountVisibility: _toggleAmountVisibility,
-          onRefresh: _refreshData,
-        );
-      },
-    );
   }
 
   @override
@@ -261,12 +44,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
-
-    // 로그인되지 않은 상태라면 로그인 화면으로 이동
-    if (!authState.isAuthenticated) {
-      return const LoginScreen();
-    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
@@ -274,9 +51,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: Row(
+        title: const Row(
           children: [
-            const Text(
+            Text(
               '도승현님!',
               style: TextStyle(
                 fontSize: 24,
@@ -577,15 +354,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             '저축예금',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               color: Colors.black54,
                             ),
                           ),
                           IconButton(
-                            icon: Icon(Icons.more_horiz),
+                            icon: const Icon(Icons.more_horiz),
                             onPressed: () {
                               showModalBottomSheet(
                                 context: context,
@@ -630,8 +407,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
-                      Row(
+                      const SizedBox(height: 8),
+                      const Row(
                         children: [
                           Text(
                             '9,742,028원',
@@ -779,13 +556,36 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildQuickMenuItem(
-                        Icons.monetization_on, '꿀머니', Colors.amber),
-                    _buildQuickMenuItem(Icons.credit_card, '카드', Colors.blue),
-                    _buildQuickMenuItem(
-                        Icons.account_balance, '캐피탈', Colors.indigo),
-                    _buildQuickMenuItem(Icons.trending_up, '증권', Colors.red),
-                    _buildQuickMenuItem(Icons.savings, '저축은행', Colors.green),
+                    _MenuButton(
+                      icon: Icons.monetization_on,
+                      label: '꿀머니',
+                      color: Colors.amber,
+                      onPressed: () {},
+                    ),
+                    _MenuButton(
+                      icon: Icons.credit_card,
+                      label: '카드',
+                      color: Colors.blue,
+                      onPressed: () {},
+                    ),
+                    _MenuButton(
+                      icon: Icons.account_balance,
+                      label: '캐피탈',
+                      color: Colors.indigo,
+                      onPressed: () {},
+                    ),
+                    _MenuButton(
+                      icon: Icons.trending_up,
+                      label: '증권',
+                      color: Colors.red,
+                      onPressed: () {},
+                    ),
+                    _MenuButton(
+                      icon: Icons.savings,
+                      label: '저축은행',
+                      color: Colors.green,
+                      onPressed: () {},
+                    ),
                   ],
                 ),
               ),
@@ -827,31 +627,30 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     );
   }
 
-  Widget _buildQuickMenuItem(IconData icon, String label, Color color) {
-    return Column(
-      children: [
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: color.withAlpha(25),
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Icon(
-            icon,
-            color: color,
-            size: 24,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-          ),
-        ),
-      ],
+  Future<void> _showAccountList(BuildContext context) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (!mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return AccountListBottomSheet(
+          isAmountVisible: _isAmountVisible,
+          onToggleAmountVisibility: _toggleAmountVisibility,
+          onRefresh: _refreshData,
+        );
+      },
     );
   }
 }
