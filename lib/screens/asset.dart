@@ -1,36 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../components/custom_bottom_navigation_bar.dart';
+import '../components/custom_end_drawer.dart';
+import '../components/loading_overlay.dart';
 
-class AssetScreen extends StatelessWidget {
+class AssetScreen extends ConsumerStatefulWidget {
   const AssetScreen({super.key});
 
   @override
+  ConsumerState<AssetScreen> createState() => _AssetScreenState();
+}
+
+class _AssetScreenState extends ConsumerState<AssetScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => _initializeScreen());
+  }
+
+  Future<void> _initializeScreen() async {
+    if (!mounted) return;
+    
+    try {
+      ref.read(loadingProvider.notifier).show(LoadingType.assetLoading);
+      // 여기에 자산 데이터 로딩 로직 추가
+      await Future.delayed(const Duration(milliseconds: 500));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('자산 정보 로딩 중 오류가 발생했습니다: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        ref.read(loadingProvider.notifier).hide();
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back,
+            color: isDarkMode ? Colors.white : Colors.black87),
           onPressed: () => context.go('/'),
         ),
-        title: const Text(
+        title: Text(
           '자산',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: isDarkMode ? Colors.white : Colors.black87,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black),
-            onPressed: () {},
-          ),
-        ],
       ),
+      endDrawer: const CustomEndDrawer(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,12 +77,12 @@ class AssetScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     const SizedBox(width: 16),
-                    _buildCategoryButton('전체', isSelected: true),
-                    _buildCategoryButton('입출금/저축'),
-                    _buildCategoryButton('대출'),
-                    _buildCategoryButton('투자'),
-                    _buildCategoryButton('연금/보험'),
-                    _buildCategoryButton('부동산'),
+                    _buildCategoryButton('전체', isSelected: true, isDarkMode: isDarkMode),
+                    _buildCategoryButton('입출금/저축', isDarkMode: isDarkMode),
+                    _buildCategoryButton('대출', isDarkMode: isDarkMode),
+                    _buildCategoryButton('투자', isDarkMode: isDarkMode),
+                    _buildCategoryButton('연금/보험', isDarkMode: isDarkMode),
+                    _buildCategoryButton('부동산', isDarkMode: isDarkMode),
                     const SizedBox(width: 16),
                   ],
                 ),
@@ -58,55 +93,94 @@ class AssetScreen extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDarkMode ? Colors.grey[900] : Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(
+                  color: isDarkMode ? Colors.grey[800]! : Theme.of(context).dividerColor,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     '흩어져 있는 내자산',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
-                  const Text(
+                  Text(
                     '한 번에 등록하고 쉽게 관리해 보세요.',
                     style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Center(
-                    child: Image.asset(
-                      'assets/icons/money_bag.png',
-                      width: 80,
-                      height: 80,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
+                  Container(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? Colors.blue[900] : Colors.blue[50],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          '자산 연결하기',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.blue[900],
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        '로그인 후 확인하기',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        const SizedBox(height: 8),
+                        Text(
+                          '은행, 증권사 등의 금융자산을\n한 번에 모아보세요.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            height: 1.4,
+                            color: isDarkMode ? Colors.grey[300] : Colors.blue[900],
+                          ),
                         ),
-                      ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/icons/chart.png',
+                          width: 20,
+                          height: 20,
+                          color: isDarkMode ? Colors.white : Colors.black87,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.bar_chart,
+                              size: 20,
+                              color: isDarkMode ? Colors.white : Colors.black87,
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '우리마이데이터',
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black87,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -118,41 +192,46 @@ class AssetScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     '나는 상위 몇 %일까?',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
-                  const Text(
+                  Text(
                     '자산등록하고 비교 분석까지!',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDarkMode ? Colors.grey[900] : Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.shade200),
+                      border: Border.all(
+                        color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
                             Text(
                               '김우리님은',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
+                                color: isDarkMode ? Colors.white : Colors.black87,
                               ),
                             ),
-                            Text(
+                            const Text(
                               ' 부동산 올인러',
                               style: TextStyle(
                                 fontSize: 18,
@@ -165,6 +244,7 @@ class AssetScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
+                                color: isDarkMode ? Colors.white : Colors.black87,
                               ),
                             ),
                           ],
@@ -175,66 +255,12 @@ class AssetScreen extends StatelessWidget {
                             Container(
                               height: 200,
                               decoration: BoxDecoration(
-                                color: Colors.grey[100],
+                                color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue,
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: const Center(
-                                      child: Text(
-                                        '부동산 자산\n76%',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Positioned(
-                              right: 16,
-                              top: 16,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  const Text(
-                                    '김우리님의',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.blue,
-                                    ),
-                                  ),
-                                  const Text(
-                                    '자산은 상위 0.5%?',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.blue,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Container(
-                                    height: 100,
-                                    width: 160,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: CustomPaint(
-                                      painter: BarChartPainter(),
-                                    ),
-                                  ),
-                                ],
+                              child: CustomPaint(
+                                painter: BarChartPainter(isDarkMode: isDarkMode),
+                                size: const Size(double.infinity, 200),
                               ),
                             ),
                           ],
@@ -250,7 +276,7 @@ class AssetScreen extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.blue[50],
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
@@ -281,6 +307,13 @@ class AssetScreen extends StatelessWidget {
                     'assets/icons/target.png',
                     width: 60,
                     height: 60,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(
+                        Icons.track_changes,
+                        size: 60,
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -290,7 +323,7 @@ class AssetScreen extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
@@ -321,6 +354,13 @@ class AssetScreen extends StatelessWidget {
                     'assets/icons/calendar.png',
                     width: 60,
                     height: 60,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(
+                        Icons.calendar_today,
+                        size: 60,
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -335,15 +375,17 @@ class AssetScreen extends StatelessWidget {
                       onPressed: () {},
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: const BorderSide(color: Colors.grey),
+                        side: BorderSide(
+                          color: isDarkMode ? Colors.grey[700]! : Colors.grey,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         '+ 자산 연결',
                         style: TextStyle(
-                          color: Colors.black,
+                          color: isDarkMode ? Colors.white : Colors.black,
                           fontSize: 16,
                         ),
                       ),
@@ -355,7 +397,9 @@ class AssetScreen extends StatelessWidget {
                       onPressed: () {},
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: const BorderSide(color: Colors.grey),
+                        side: BorderSide(
+                          color: isDarkMode ? Colors.grey[700]! : Colors.grey,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -367,12 +411,20 @@ class AssetScreen extends StatelessWidget {
                             'assets/icons/chart.png',
                             width: 20,
                             height: 20,
+                            color: isDarkMode ? Colors.white : Colors.black87,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(
+                                Icons.bar_chart,
+                                size: 20,
+                                color: isDarkMode ? Colors.white : Colors.black87,
+                              );
+                            },
                           ),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             '우리마이데이터',
                             style: TextStyle(
-                              color: Colors.black,
+                              color: isDarkMode ? Colors.white : Colors.black,
                               fontSize: 16,
                             ),
                           ),
@@ -391,26 +443,33 @@ class AssetScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryButton(String label, {bool isSelected = false}) {
+  Widget _buildCategoryButton(String text, {bool isSelected = false, required bool isDarkMode}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       child: TextButton(
         onPressed: () {},
         style: TextButton.styleFrom(
-          backgroundColor: isSelected ? Colors.black : Colors.transparent,
+          backgroundColor: isSelected 
+            ? (isDarkMode ? Colors.blue[900] : Colors.blue) 
+            : Colors.transparent,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
             side: BorderSide(
-              color: isSelected ? Colors.black : Colors.grey,
+              color: isSelected 
+                ? (isDarkMode ? Colors.blue[800]! : Colors.blue) 
+                : (isDarkMode ? Colors.grey[700]! : Colors.grey[400]!),
             ),
           ),
         ),
         child: Text(
-          label,
+          text,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black,
             fontSize: 14,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected
+                ? Colors.white
+                : (isDarkMode ? Colors.white : Colors.black87),
           ),
         ),
       ),
@@ -419,15 +478,19 @@ class AssetScreen extends StatelessWidget {
 }
 
 class BarChartPainter extends CustomPainter {
+  final bool isDarkMode;
+
+  const BarChartPainter({this.isDarkMode = false});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.blue[100]!
+      ..color = isDarkMode ? Colors.blue[700]! : Colors.blue[100]!
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round;
 
     final paint2 = Paint()
-      ..color = Colors.grey[300]!
+      ..color = isDarkMode ? Colors.grey[700]! : Colors.grey[300]!
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round;
 

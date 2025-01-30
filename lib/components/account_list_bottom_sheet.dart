@@ -1,29 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'loading_overlay.dart';
 
-class AccountListBottomSheet extends StatefulWidget {
+class AccountListBottomSheet extends ConsumerStatefulWidget {
   final bool isAmountVisible;
   final VoidCallback onToggleAmountVisibility;
   final Future<void> Function() onRefresh;
 
   const AccountListBottomSheet({
-    Key? key,
+    super.key,
     required this.isAmountVisible,
     required this.onToggleAmountVisibility,
     required this.onRefresh,
-  }) : super(key: key);
+  });
 
   @override
-  State<AccountListBottomSheet> createState() => _AccountListBottomSheetState();
+  ConsumerState<AccountListBottomSheet> createState() => _AccountListBottomSheetState();
 }
 
-class _AccountListBottomSheetState extends State<AccountListBottomSheet> {
+class _AccountListBottomSheetState extends ConsumerState<AccountListBottomSheet> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => _initializeScreen());
+  }
+
+  Future<void> _initializeScreen() async {
+    if (!mounted) return;
+    
+    try {
+      ref.read(loadingProvider.notifier).show(LoadingType.accountLoading);
+      // 여기에 계좌 목록 데이터 로딩 로직 추가
+      await Future.delayed(const Duration(milliseconds: 500));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('계좌 목록 로딩 중 오류가 발생했습니다: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        ref.read(loadingProvider.notifier).hide();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[900] : Colors.white,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
@@ -35,7 +68,7 @@ class _AccountListBottomSheetState extends State<AccountListBottomSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -44,27 +77,20 @@ class _AccountListBottomSheetState extends State<AccountListBottomSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   '전체 계좌',
                   style: TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontFamily: '.SF Pro Display',
+                    fontWeight: FontWeight.w600,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
                 Row(
                   children: [
-                    // IconButton(
-                    //   icon: Icon(widget.isAmountVisible
-                    //       ? Icons.visibility
-                    //       : Icons.visibility_off),
-                    //   onPressed: widget.onToggleAmountVisibility,
-                    // ),
-                    // IconButton(
-                    //   icon: const Icon(Icons.refresh),
-                    //   onPressed: widget.onRefresh,
-                    // ),
                     IconButton(
-                      icon: const Icon(Icons.close),
+                      icon: Icon(Icons.close,
+                        color: isDarkMode ? Colors.white : Colors.black87),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -72,44 +98,52 @@ class _AccountListBottomSheetState extends State<AccountListBottomSheet> {
               ],
             ),
           ),
-          const Divider(height: 16),
+          Divider(
+            height: 16,
+            color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+          ),
           Expanded(
             child: RefreshIndicator(
               onRefresh: widget.onRefresh,
               child: ListView(
                 children: [
                   _buildAccountItem(
+                    context,
                     '저축예금',
                     '우리 122-201290-02-101',
                     '9,742,028',
-                    const Color(0xFFF8E8FF),
+                    isDarkMode ? Colors.grey[800]! : const Color(0xFFF8E8FF),
                   ),
                   _buildAccountItem(
+                    context,
                     '입출금통장',
                     '신한 110-123-456789',
                     '2,580,000',
-                    const Color(0xFFE8F3FF),
+                    isDarkMode ? Colors.grey[800]! : const Color(0xFFE8F3FF),
                   ),
                   _buildAccountItem(
+                    context,
                     'CMA 통장',
                     'KB 123-45-6789012',
                     '5,320,450',
-                    const Color(0xFFE8FFE8),
+                    isDarkMode ? Colors.grey[800]! : const Color(0xFFE8FFE8),
                   ),
                 ],
               ),
             ),
           ),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 40),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDarkMode ? Colors.grey[900] : Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withAlpha(25),
+                  color: isDarkMode 
+                    ? Colors.black26 
+                    : Colors.grey.withAlpha(25),
                   spreadRadius: 1,
                   blurRadius: 10,
-                  offset: const Offset(0, -3),
+                  offset: const Offset(0, -5),
                 ),
               ],
             ),
@@ -117,21 +151,25 @@ class _AccountListBottomSheetState extends State<AccountListBottomSheet> {
               children: [
                 Expanded(
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         '총 자산',
                         style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
+                          fontSize: 13,
+                          fontFamily: '.SF Pro Text',
+                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 1),
                       Text(
                         widget.isAmountVisible ? '17,642,478원' : '******',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontFamily: '.SF Pro Display',
+                          fontWeight: FontWeight.w600,
+                          color: isDarkMode ? Colors.white : Colors.black87,
                         ),
                       ),
                     ],
@@ -142,8 +180,8 @@ class _AccountListBottomSheetState extends State<AccountListBottomSheet> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
+                      horizontal: 16,
+                      vertical: 8,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -152,8 +190,10 @@ class _AccountListBottomSheetState extends State<AccountListBottomSheet> {
                   child: const Text(
                     '계좌 추가하기',
                     style: TextStyle(
+                      fontFamily: '.SF Pro Display',
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
                     ),
                   ),
                 ),
@@ -165,8 +205,10 @@ class _AccountListBottomSheetState extends State<AccountListBottomSheet> {
     );
   }
 
-  Widget _buildAccountItem(String title, String accountNumber, String amount,
-      Color backgroundColor) {
+  Widget _buildAccountItem(BuildContext context, String title, String accountNumber,
+      String amount, Color backgroundColor) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return GestureDetector(
       onTap: () => _showAccountDetail(context, title, accountNumber, amount),
       child: Container(
@@ -184,21 +226,33 @@ class _AccountListBottomSheetState extends State<AccountListBottomSheet> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
-                    color: Colors.black54,
+                    fontFamily: '.SF Pro Display',
+                    fontWeight: FontWeight.w500,
+                    color: isDarkMode ? Colors.grey[300] : Colors.black54,
                   ),
                 ),
                 PopupMenuButton(
-                  icon: const Icon(Icons.more_horiz),
+                  icon: Icon(Icons.more_horiz,
+                    color: isDarkMode ? Colors.white : Colors.black87),
+                  color: isDarkMode ? Colors.grey[800] : Colors.white,
                   itemBuilder: (context) => [
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'copy',
-                      child: Text('계좌번호 복사'),
+                      child: Text('계좌번호 복사',
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black87,
+                        ),
+                      ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'share',
-                      child: Text('공유하기'),
+                      child: Text('공유하기',
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black87,
+                        ),
+                      ),
                     ),
                   ],
                   onSelected: (value) {
@@ -216,17 +270,20 @@ class _AccountListBottomSheetState extends State<AccountListBottomSheet> {
               children: [
                 Text(
                   amount,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    fontFamily: '.SF Pro Display',
+                    fontWeight: FontWeight.w600,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   accountNumber,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    color: Colors.black54,
+                    fontFamily: '.SF Pro Text',
+                    color: isDarkMode ? Colors.grey[300] : Colors.black54,
                   ),
                 ),
               ],

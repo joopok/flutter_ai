@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../components/account_list_bottom_sheet.dart';
-import 'package:intl/intl.dart';
 import '../components/custom_bottom_navigation_bar.dart';
+import '../components/custom_end_drawer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/auth_provider.dart';
-import '../screens/login_screen.dart';
+import '../components/loading_overlay.dart';
+
 
 
 class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key});
-
-  String formatWon(String amount) {
-    final format = NumberFormat.currency(locale: 'ko_KR', symbol: '원');
-    return format.format(amount);
-  }
 
   @override
   ConsumerState<MyHomePage> createState() => _MyHomePageState();
@@ -24,7 +19,35 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   final PageController _pageController = PageController(viewportFraction: 0.9);
   int _currentPage = 0;
   bool _isAmountVisible = true;
-  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => _initializeScreen());
+  }
+
+  Future<void> _initializeScreen() async {
+    if (!mounted) return;
+    
+    try {
+      ref.read(loadingProvider.notifier).show(LoadingType.initializing);
+      // 여기에 초기 데이터 로딩 로직 추가
+      await Future.delayed(const Duration(milliseconds: 1000));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('데이터 로딩 중 오류가 발생했습니다: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        ref.read(loadingProvider.notifier).hide();
+      }
+    }
+  }
 
   void _toggleAmountVisibility() {
     setState(() {
@@ -33,7 +56,52 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 
   Future<void> _refreshData() async {
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      await ref.read(loadingProvider.notifier).during(
+        () => Future.delayed(const Duration(seconds: 2)),
+        type: LoadingType.refreshing,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('새로고침 중 오류가 발생했습니다: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _showAccountList(BuildContext context) async {
+    if (!mounted) return;
+    
+    try {
+      await ref.read(loadingProvider.notifier).during(
+        () async {
+          await showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => AccountListBottomSheet(
+              isAmountVisible: _isAmountVisible,
+              onToggleAmountVisibility: _toggleAmountVisibility,
+              onRefresh: _refreshData,
+            ),
+          );
+        },
+        type: LoadingType.accountLoading,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('계좌 정보 로딩 중 오류가 발생했습니다: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -44,20 +112,23 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isLoading = ref.watch(loadingProvider).isLoading;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: const Row(
+        title: Row(
           children: [
             Text(
               '도승현님!',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
           ],
@@ -152,7 +223,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               IconButton(
                 icon: const Icon(Icons.notifications_none_outlined),
                 onPressed: () {
-                  context.go('/notice-list'); // 공지사항 목록 화면으로 이동
+                  context.go('/notice-list');
                 },
               ),
               Positioned(
@@ -193,117 +264,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           ),
         ],
       ),
-      endDrawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFFF8E8FF), Color(0xFFE8F8FF)],
-                ),
-              ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: NetworkImage('https://cdn-icons-png.flaticon.com/512/3135/3135715.png'),
-                  ),
-                  SizedBox(width: 16),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '도승현님',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'test@example.com',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home_outlined),
-              title: const Text('홈'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings_outlined),
-              title: const Text('설정'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.info_outline),
-              title: const Text('앱 정보'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text(
-                '로그아웃',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('로그아웃'),
-                    content: const Text('정말 로그아웃 하시겠습니까?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('취소'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          ref.read(authProvider.notifier).logout();
-                          context.go('/login');
-                        },
-                        child: const Text(
-                          '로그아웃',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      endDrawer: const CustomEndDrawer(),
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.all(16.0),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -312,7 +281,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          letterSpacing: -1.0),
+                        letterSpacing: -1.0,
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                      ),
                     ),
                     Row(
                       children: [
@@ -321,20 +292,23 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                           style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              letterSpacing: -1.0),
+                            letterSpacing: -1.0,
+                            color: isDarkMode ? Colors.white : Colors.black87,
+                          ),
                         ),
-                        Icon(Icons.arrow_forward),
+                        Icon(Icons.arrow_forward,
+                          color: isDarkMode ? Colors.white : Colors.black87),
                       ],
                     ),
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
                   '더보기 1',
                   style: TextStyle(
-                    color: Colors.grey,
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey,
                     fontSize: 14,
                   ),
                 ),
@@ -343,41 +317,46 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8E8FF),
+                  color: isDarkMode ? Colors.grey[900] : const Color(0xFFF8E8FF),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(20.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             '저축예금',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.black54,
+                              color: isDarkMode ? Colors.grey[300] : Colors.black54,
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.more_horiz),
+                            icon: Icon(Icons.more_horiz,
+                              color: isDarkMode ? Colors.white : Colors.black87),
                             onPressed: () {
                               showModalBottomSheet(
                                 context: context,
                                 builder: (context) {
                                   return Container(
                                     padding: const EdgeInsets.all(20),
+                                    color: isDarkMode ? Colors.grey[900] : Colors.white,
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         ListTile(
-                                          leading: const Icon(Icons.edit,
+                                          leading: Icon(Icons.edit,
                                               color: Colors.blue),
-                                          title: const Text('수정하기'),
+                                          title: Text('수정하기',
+                                            style: TextStyle(
+                                              color: isDarkMode ? Colors.white : Colors.black87,
+                                            ),
+                                          ),
                                           onTap: () {
                                             Navigator.pop(context);
                                           },
@@ -385,15 +364,23 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                         ListTile(
                                           leading: const Icon(Icons.delete,
                                               color: Colors.red),
-                                          title: const Text('삭제하기'),
+                                          title: Text('삭제하기',
+                                            style: TextStyle(
+                                              color: isDarkMode ? Colors.white : Colors.black87,
+                                            ),
+                                          ),
                                           onTap: () {
                                             Navigator.pop(context);
                                           },
                                         ),
                                         ListTile(
-                                          leading: const Icon(Icons.close,
-                                              color: Colors.grey),
-                                          title: const Text('닫기'),
+                                          leading: Icon(Icons.close,
+                                            color: isDarkMode ? Colors.grey[400] : Colors.grey),
+                                          title: Text('닫기',
+                                            style: TextStyle(
+                                              color: isDarkMode ? Colors.white : Colors.black87,
+                                            ),
+                                          ),
                                           onTap: () {
                                             Navigator.pop(context);
                                           },
@@ -408,21 +395,22 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      const Row(
+                      Row(
                         children: [
                           Text(
                             '9,742,028원',
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
+                              color: isDarkMode ? Colors.white : Colors.black87,
                             ),
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             '우리 122-201290-02-101',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.black54,
+                              color: isDarkMode ? Colors.grey[300] : Colors.black54,
                             ),
                           ),
                         ],
@@ -436,31 +424,31 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 width: double.infinity,
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 child: ElevatedButton(
-                  onPressed:
-                      _isLoading ? null : () => _showAccountList(context),
+                  onPressed: isLoading ? null : () => _showAccountList(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
+                  child: isLoading
+                      ? SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.grey),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              isDarkMode ? Colors.white : Colors.grey),
                           ),
                         )
-                      : const Text(
+                      : Text(
                           '전체계좌보기',
                           style: TextStyle(
-                              color: Colors.black,
+                            color: isDarkMode ? Colors.white : Colors.black,
                               fontSize: 18,
-                              letterSpacing: -1.0),
+                            letterSpacing: -1.0,
+                          ),
                         ),
                 ),
               ),
@@ -479,14 +467,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 5.0),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE8F3FF),
+                        color: isDarkMode ? Colors.grey[900] : const Color(0xFFE8F3FF),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Row(
                           children: [
-                            const Expanded(
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -496,13 +484,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
+                                      color: isDarkMode ? Colors.white : Colors.black87,
                                     ),
                                   ),
                                   Text(
                                     '스타벅스 커피부터\n댕펫킹 인형까지!',
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: Colors.black54,
+                                      color: isDarkMode ? Colors.grey[300] : Colors.black54,
                                     ),
                                   ),
                                 ],
@@ -593,29 +582,37 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16.0),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: ListTile(
                   leading: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: isDarkMode ? Colors.blue : Colors.black,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Text(
+                    child: Text(
                       '공지',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.white,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
-                  title: const Text(
+                  title: Text(
                     '우리WON뱅킹이 새로운 모습으로 바뀌어요',
-                    style: TextStyle(fontSize: 14),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                   ),
-                  trailing: const Icon(Icons.chevron_right),
+                  trailing: Icon(
+                    Icons.chevron_right,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
                   onTap: () {
-                    context.go('/notice-list'); // 공지사항 목록 화면으로 이동
+                    context.go('/notice-list');
                   },
                 ),
               ),
@@ -624,33 +621,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         ),
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 2),
-    );
-  }
-
-  Future<void> _showAccountList(BuildContext context) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    await Future.delayed(const Duration(seconds: 1));
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (!mounted) return;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return AccountListBottomSheet(
-          isAmountVisible: _isAmountVisible,
-          onToggleAmountVisibility: _toggleAmountVisibility,
-          onRefresh: _refreshData,
-        );
-      },
     );
   }
 }

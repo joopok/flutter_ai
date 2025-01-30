@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import '../components/custom_app_bar.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../components/custom_bottom_navigation_bar.dart';
+import '../components/custom_end_drawer.dart';
+import '../components/loading_overlay.dart';
 
 // 클래스 외부로 이동
 final Map<String, IconData> _menuIcons = {
@@ -20,16 +23,69 @@ final Map<String, IconData> _menuIcons = {
   '우금융상품': Icons.account_balance,
 };
 
-class ProductScreen extends StatelessWidget {
+class ProductScreen extends ConsumerStatefulWidget {
   const ProductScreen({super.key});
 
   @override
+  ConsumerState<ProductScreen> createState() => _ProductScreenState();
+}
+
+class _ProductScreenState extends ConsumerState<ProductScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => _initializeScreen());
+  }
+
+  Future<void> _initializeScreen() async {
+    if (!mounted) return;
+    
+    try {
+      ref.read(loadingProvider.notifier).show(LoadingType.productLoading);
+      // 여기에 상품 데이터 로딩 로직 추가
+      await Future.delayed(const Duration(milliseconds: 500));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('상품 정보 로딩 중 오류가 발생했습니다: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        ref.read(loadingProvider.notifier).hide();
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: const CustomAppBar(title: '상품몰'),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, 
+              color: isDarkMode ? Colors.white : Colors.black87),
+            onPressed: () => context.go('/'),
+          ),
+          title: Text(
+            '상품',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black87,
+            ),
+          ),
+        ),
+        endDrawer: const CustomEndDrawer(),
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,6 +97,7 @@ class ProductScreen extends StatelessWidget {
                     Expanded(
                       flex: 6,
                       child: _buildLargeMenuItem(
+                        context,
                         title: '입출금/예금/적금',
                         subtitle: '자산형성은 꾸준히 안전하게',
                         isBlue: true,
@@ -50,6 +107,7 @@ class ProductScreen extends StatelessWidget {
                     Expanded(
                       flex: 4,
                       child: _buildLargeMenuItem(
+                        context,
                         title: '청약',
                         subtitle: '내집 마련의 시작',
                       ),
@@ -68,50 +126,62 @@ class ProductScreen extends StatelessWidget {
                   childAspectRatio: 0.85,
                   children: [
                     _buildMenuItem(
+                      context,
                       title: '대출',
                       subtitle: '대출 금리와\n한도는?',
                     ),
                     _buildMenuItem(
+                      context,
                       title: '펀드',
                       subtitle: '더 높기 전에\n투자하자!',
                     ),
                     _buildMenuItem(
+                      context,
                       title: '퇴직연금',
                       subtitle: '개인형IRP로\n준비하자!',
                     ),
                     _buildMenuItem(
+                      context,
                       title: '신탁',
                       subtitle: 'ELT/ETF/채권형/\n상속·증여신탁상담',
                     ),
                     _buildMenuItem(
+                      context,
                       title: 'ISA',
                       subtitle: '개인종합\n자산관리',
                     ),
                     _buildMenuItem(
+                      context,
                       title: '외환',
                       subtitle: '최대 100%\n환율우대',
                     ),
                     _buildMenuItem(
+                      context,
                       title: '개인사업자',
                       subtitle: '사장님을\n위한 상품이?',
                     ),
                     _buildMenuItem(
+                      context,
                       title: '보험',
                       subtitle: '더 높기 전에\n준비하자!',
                     ),
                     _buildMenuItem(
+                      context,
                       title: '골드/실버',
                       subtitle: '재테크도\n실물로',
                     ),
                     _buildMenuItem(
+                      context,
                       title: '카드',
                       subtitle: '혜택으로 우대받고\n할인으로 알뜰하게',
                     ),
                     _buildMenuItem(
+                      context,
                       title: '증권계좌',
                       subtitle: '우리로 증권계좌\n연결까지',
                     ),
                     _buildMenuItem(
+                      context,
                       title: '상상은행상품',
                       subtitle: '상상은행그룹\n상품을 한 곳에서',
                     ),
@@ -140,7 +210,7 @@ class ProductScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildTravelCard(),
+                    _buildTravelCard(context),
                     const SizedBox(height: 16),
                   ],
                 ),
@@ -154,18 +224,22 @@ class ProductScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLargeMenuItem({
+  Widget _buildLargeMenuItem(BuildContext context, {
     required String title,
     required String subtitle,
     bool isBlue = false,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withAlpha(25),
+            color: isDarkMode 
+              ? Colors.black26 
+              : Colors.grey.withAlpha(25),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -183,9 +257,10 @@ class ProductScreen extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -193,7 +268,7 @@ class ProductScreen extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey[600],
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                     ),
                   ),
                 ],
@@ -202,7 +277,7 @@ class ProductScreen extends StatelessWidget {
             Icon(
               _menuIcons[title] ?? Icons.help_outline,
               size: 32,
-              color: Colors.blue,
+              color: isDarkMode ? Colors.blue[300] : Colors.blue,
             ),
           ],
         ),
@@ -210,17 +285,21 @@ class ProductScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem({
+  Widget _buildMenuItem(BuildContext context, {
     required String title,
     required String subtitle,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withAlpha(25),
+            color: isDarkMode 
+              ? Colors.black26 
+              : Colors.grey.withAlpha(25),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -234,9 +313,10 @@ class ProductScreen extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
             const SizedBox(height: 4),
@@ -244,7 +324,7 @@ class ProductScreen extends StatelessWidget {
               subtitle,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey[600],
+                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                 height: 1.2,
               ),
             ),
@@ -254,7 +334,7 @@ class ProductScreen extends StatelessWidget {
               child: Icon(
                 _menuIcons[title] ?? Icons.help_outline,
                 size: 24,
-                color: Colors.blue,
+                color: isDarkMode ? Colors.blue[300] : Colors.blue,
               ),
             ),
           ],
@@ -263,7 +343,9 @@ class ProductScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTravelCard() {
+  Widget _buildTravelCard(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       height: 240,
@@ -284,7 +366,9 @@ class ProductScreen extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  Colors.black.withAlpha(77),
+                  isDarkMode 
+                    ? Colors.black.withAlpha(150)
+                    : Colors.black.withAlpha(77),
                 ],
               ),
             ),
@@ -295,10 +379,10 @@ class ProductScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '환전주머니',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.white : Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -306,11 +390,11 @@ class ProductScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    _buildTag('여행'),
+                    _buildTag('여행', isDarkMode),
                     const SizedBox(width: 8),
-                    _buildTag('즐거움'),
+                    _buildTag('즐거움', isDarkMode),
                     const SizedBox(width: 8),
-                    _buildTag('편리한'),
+                    _buildTag('편리한', isDarkMode),
                   ],
                 ),
               ],
@@ -321,17 +405,19 @@ class ProductScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTag(String text) {
+  Widget _buildTag(String text, bool isDarkMode) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.black.withAlpha(77),
+        color: isDarkMode 
+          ? Colors.black.withAlpha(150)
+          : Colors.black.withAlpha(77),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
         text,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: isDarkMode ? Colors.white : Colors.white,
           fontSize: 12,
         ),
       ),

@@ -1,21 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../components/custom_bottom_navigation_bar.dart';
+import '../components/custom_end_drawer.dart';
+import '../components/loading_overlay.dart';
 
-class FavorScreen extends StatefulWidget {
+class FavorScreen extends ConsumerStatefulWidget {
   const FavorScreen({super.key});
 
   @override
-  State<FavorScreen> createState() => _FavorScreenState();
+  ConsumerState<FavorScreen> createState() => _FavorScreenState();
 }
 
-class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStateMixin {
+class _FavorScreenState extends ConsumerState<FavorScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    Future.microtask(() => _initializeScreen());
+  }
+
+  Future<void> _initializeScreen() async {
+    if (!mounted) return;
+    
+    try {
+      ref.read(loadingProvider.notifier).show(LoadingType.benefitLoading);
+      // 여기에 혜택 데이터 로딩 로직 추가
+      await Future.delayed(const Duration(milliseconds: 500));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('혜택 정보 로딩 중 오류가 발생했습니다: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        ref.read(loadingProvider.notifier).hide();
+      }
+    }
   }
 
   @override
@@ -26,39 +53,49 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black87),
+            icon: Icon(
+              Icons.arrow_back,
+              color: isDarkMode ? Colors.white : Colors.black87,
+            ),
             onPressed: () => context.go('/'),
           ),
-          title: const Text(
+          title: Text(
             '혜택',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: isDarkMode ? Colors.white : Colors.black87,
             ),
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black87),
-              onPressed: () {},
+            Builder(
+              builder: (context) => IconButton(
+                icon: Icon(Icons.menu,
+                  color: isDarkMode ? Colors.white : Colors.black87),
+                onPressed: () {
+                  Scaffold.of(context).openEndDrawer();
+                },
+              ),
             ),
           ],
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(48),
             child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: isDarkMode ? Colors.grey[900] : Colors.white,
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.black12,
+                    color: isDarkMode ? Colors.grey[800]! : Colors.black12,
                     width: 1,
                   ),
                 ),
@@ -73,19 +110,20 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
-                indicatorColor: Colors.black87,
-                labelColor: Colors.black87,
+                indicatorColor: isDarkMode ? Colors.white : Colors.black87,
+                labelColor: isDarkMode ? Colors.white : Colors.black87,
                 unselectedLabelColor: Colors.grey,
                 indicatorWeight: 2,
               ),
             ),
           ),
         ),
+        endDrawer: const CustomEndDrawer(),
         body: TabBarView(
           controller: _tabController,
           children: [
-            _buildBenefitsTab(),
-            _buildLifestyleTab(),
+            _buildBenefitsTab(isDarkMode),
+            _buildLifestyleTab(isDarkMode),
           ],
         ),
         bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 4),
@@ -93,7 +131,7 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildBenefitsTab() {
+  Widget _buildBenefitsTab(bool isDarkMode) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,22 +146,32 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
                   children: [
                     const Icon(Icons.monetization_on, color: Colors.amber),
                     const SizedBox(width: 8),
-                    const Text(
+                    Text(
                       '내 꿀머니',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black87,
                       ),
                     ),
-                    const Icon(Icons.arrow_forward_ios, size: 16),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                     const Spacer(),
                     Text(
                       '43,099',
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black87,
                       ),
                     ),
-                    const Icon(Icons.arrow_forward_ios, size: 16),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -131,12 +179,14 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.grey[50],
+                    color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
+                  child: Text(
                     '꿀머니 지급 0원 더 받을 수 있어요',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey,
+                    ),
                   ),
                 ),
               ],
@@ -147,21 +197,31 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Colors.grey[200]!),
+                bottom: BorderSide(
+                  color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+                ),
               ),
             ),
             child: Row(
               children: [
-                const Text(
+                Text(
                   'MY쿠폰',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
                 const Spacer(),
-                Icon(Icons.confirmation_number_outlined, color: Colors.grey[400]),
-                const Icon(Icons.arrow_forward_ios, size: 16),
+                Icon(
+                  Icons.confirmation_number_outlined,
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[400],
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
               ],
             ),
           ),
@@ -174,18 +234,21 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       '도승현님만을 위한 이벤트',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black87,
                       ),
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDarkMode ? Colors.grey[900] : Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.grey[300]!),
+                        border: Border.all(
+                          color: isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
+                        ),
                       ),
                       child: Material(
                         color: Colors.transparent,
@@ -193,11 +256,14 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
                           onTap: () {},
                           borderRadius: BorderRadius.circular(20),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             child: Text(
                               '더보기',
                               style: TextStyle(
-                                color: Colors.grey[600],
+                                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                                 fontSize: 14,
                               ),
                             ),
@@ -212,14 +278,12 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
-                      colors: [
-                        Color(0xFF2196F3),
-                         Color.fromARGB(255, 26, 117, 192),
-                        Color(0xFF64B5F6),
-                      ],
+                      colors: isDarkMode
+                          ? [Colors.blue[900]!, Colors.indigo[900]!, Colors.blue[800]!]
+                          : [const Color(0xFF2196F3), const Color.fromARGB(255, 26, 117, 192), const Color(0xFF64B5F6)],
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -240,18 +304,27 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '2025.01.02 ~ 2025.01.31',
+                              '2024.01.28 ~ 2024.02.28',
                               style: TextStyle(
-                                color: Colors.white.withAlpha(204),
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 14,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(
-                        Icons.card_giftcard,
-                        size: 80,
-                        color: Colors.white,
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.card_giftcard,
+                          color: Colors.white,
+                          size: 40,
+                        ),
                       ),
                     ],
                   ),
@@ -268,18 +341,21 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       '매일매일 WON PLAY',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black87,
                       ),
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDarkMode ? Colors.grey[900] : Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.grey[300]!),
+                        border: Border.all(
+                          color: isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
+                        ),
                       ),
                       child: Material(
                         color: Colors.transparent,
@@ -287,11 +363,14 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
                           onTap: () {},
                           borderRadius: BorderRadius.circular(20),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             child: Text(
                               '더보기',
                               style: TextStyle(
-                                color: Colors.grey[600],
+                                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                                 fontSize: 14,
                               ),
                             ),
@@ -302,80 +381,66 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
                   ],
                 ),
                 const SizedBox(height: 16),
-                _buildWonPlayItem(
-                  icon: Icons.play_circle_outline,
-                  title: 'WON으로 출석하면~!',
-                  subtitle: 'WOW! 꿀머니가~?!',
-                ),
-                _buildWonPlayItem(
-                  icon: Icons.card_giftcard,
-                  title: '즉석 당첨 응모',
-                  subtitle: '매일 참여하는 달콤~한 간식 뽑기!',
-                ),
-                _buildWonPlayItem(
-                  icon: Icons.favorite_border,
-                  title: '2025년',
-                  subtitle: '새해 다짐을 작성해주세요!',
-                ),
-                _buildWonPlayItem(
-                  icon: Icons.emoji_emotions_outlined,
-                  title: '색깔에 맞게 위비 GO!',
-                  subtitle: '미션점수 달성 GO!',
-                ),
-                _buildWonPlayItem(
-                  icon: Icons.grid_view,
-                  title: '클자에 맞는 색?! 컬러픽',
-                  subtitle: '컬러 고르고 미션 달성!',
-                ),
-                _buildWonPlayItem(
-                  icon: Icons.restaurant_menu,
-                  title: '봄봄이를 구해줘~! 레시피프',
-                  subtitle: '레디~ 점프! 해서 미션 달성!',
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWonPlayItem({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.grey[200]!),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 48,
-            color: Colors.blue,
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? Colors.grey[900] : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+                    ),
                   ),
-                ),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
+                  child: Column(
+                    children: [
+                      _buildWonPlayItem(
+                        icon: Icons.monetization_on,
+                        iconColor: Colors.amber,
+                        title: 'WON으로 출석하면~!',
+                        subtitle: 'WOW! 꿀머니가~?!',
+                        isDarkMode: isDarkMode,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildWonPlayItem(
+                        icon: Icons.card_giftcard,
+                        iconColor: Colors.purple,
+                        title: '즉석 당첨 응모',
+                        subtitle: '매일 참여하는 달콤~한 간식 뽑기!',
+                        isDarkMode: isDarkMode,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildWonPlayItem(
+                        icon: Icons.favorite,
+                        iconColor: Colors.red,
+                        title: '2025년',
+                        subtitle: '새해 다짐을 작성해주세요!',
+                        isDarkMode: isDarkMode,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildWonPlayItem(
+                        icon: Icons.star,
+                        iconColor: Colors.blue,
+                        title: '색깔에 맞게 위비 GO!',
+                        subtitle: '미션점수 달성 GO!',
+                        isDarkMode: isDarkMode,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildWonPlayItem(
+                        icon: Icons.grid_view,
+                        iconColor: Colors.orange,
+                        title: '글자에 맞는 색?! 컬러픽',
+                        subtitle: '컬러 고르고 미션 달성!',
+                        isDarkMode: isDarkMode,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildWonPlayItem(
+                        icon: Icons.cake,
+                        iconColor: Colors.pink,
+                        title: '봄봄이를 구해줘~! 레디저프트',
+                        subtitle: '레디~ 점프! 해서 미션 달성!',
+                        isDarkMode: isDarkMode,
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -386,7 +451,7 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildLifestyleTab() {
+  Widget _buildLifestyleTab(bool isDarkMode) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,11 +462,12 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '추천혜택',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -412,21 +478,25 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
                       icon: Icons.event,
                       label: '이벤트',
                       onTap: () => context.go('/event'),
+                      isDarkMode: isDarkMode,
                     ),
                     _buildRecommendedItem(
                       icon: Icons.business_center,
                       label: '우리직장인\n설렘',
                       onTap: () => context.go('/workplace'),
+                      isDarkMode: isDarkMode,
                     ),
                     _buildRecommendedItem(
                       icon: Icons.emoji_events,
                       label: 'e스포츠관',
                       onTap: () => context.go('/esports'),
+                      isDarkMode: isDarkMode,
                     ),
                     _buildRecommendedItem(
                       icon: Icons.backpack,
                       label: '우리턴',
                       onTap: () => context.go('/teen'),
+                      isDarkMode: isDarkMode,
                     ),
                   ],
                 ),
@@ -439,11 +509,12 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '또 다른 다양한 혜택',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -451,26 +522,31 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
                   icon: Icons.auto_awesome,
                   title: '운세 보기',
                   subtitle: '재미있고 다양한 14가지',
+                  isDarkMode: isDarkMode,
                 ),
                 _buildOtherBenefitItem(
                   icon: Icons.local_cafe,
                   title: '쿠폰함',
                   subtitle: '모바일 쿠폰 구매하기',
+                  isDarkMode: isDarkMode,
                 ),
                 _buildOtherBenefitItem(
                   icon: Icons.child_care,
                   title: '우리아이',
                   subtitle: '우리아이 금융생활 시작',
+                  isDarkMode: isDarkMode,
                 ),
                 _buildOtherBenefitItem(
                   icon: Icons.looks_two,
                   title: '스무살 우리',
                   subtitle: '20대를 위한 서비스',
+                  isDarkMode: isDarkMode,
                 ),
                 _buildOtherBenefitItem(
                   icon: Icons.school,
                   title: '시니어W클래스',
                   subtitle: '시니어고객님을 위한 무료 강의',
+                  isDarkMode: isDarkMode,
                 ),
               ],
             ),
@@ -484,6 +560,7 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    required bool isDarkMode,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -498,8 +575,9 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
           Text(
             label,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
+              color: isDarkMode ? Colors.white : Colors.black87,
             ),
           ),
         ],
@@ -511,12 +589,15 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
     required IconData icon,
     required String title,
     required String subtitle,
+    required bool isDarkMode,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: Colors.grey[200]!),
+          bottom: BorderSide(
+            color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+          ),
         ),
       ),
       child: Row(
@@ -533,15 +614,16 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                     fontSize: 14,
                   ),
                 ),
@@ -550,6 +632,55 @@ class _FavorScreenState extends State<FavorScreen> with SingleTickerProviderStat
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildWonPlayItem({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required bool isDarkMode,
+  }) {
+    return Row(
+      children: [
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: iconColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            color: iconColor,
+            size: 24,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 } 

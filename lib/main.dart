@@ -3,6 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'config/router.dart';
 import 'providers/auth_provider.dart';
+import 'providers/theme_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'screens/home.dart';
+import 'screens/asset.dart';
+import 'screens/product.dart';
+import 'screens/consume.dart';
+import 'screens/favor.dart';
+import 'screens/notice.dart';
+import 'components/loading_overlay.dart';
+import 'config/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,28 +43,97 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+    
     return MaterialApp.router(
-      routerConfig: ref.watch(routerProvider),
-      title: '우리 앱',
-      debugShowCheckedModeBanner: false,
+      title: 'WON Banking',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
+        useMaterial3: true,
+        colorScheme: ColorScheme.light(
+          primary: Colors.blue,
+          secondary: Colors.blueAccent,
+          surface: Colors.white,
+          background: Colors.grey[50]!,
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          onSurface: Colors.black87,
+          onBackground: Colors.black87,
+        ),
+        scaffoldBackgroundColor: Colors.grey[50],
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.grey[50],
           elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black87),
-          titleTextStyle: TextStyle(
-            color: Colors.black87,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+        ),
+        cardTheme: CardTheme(
+          color: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
         ),
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.dark(
+          primary: Colors.blue[700]!,
+          secondary: Colors.blueAccent[700]!,
+          surface: Colors.grey[900]!,
+          background: Colors.black,
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          onSurface: Colors.white,
+          onBackground: Colors.white,
+        ),
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.grey[900],
+          elevation: 0,
+        ),
+        cardTheme: CardTheme(
+          color: Colors.grey[900],
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
+      themeMode: themeMode,
+      routerConfig: GoRouter(
+        initialLocation: '/',
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const MyHomePage(),
+          ),
+          GoRoute(
+            path: '/asset',
+            builder: (context, state) => const AssetScreen(),
+          ),
+          GoRoute(
+            path: '/product',
+            builder: (context, state) => const ProductScreen(),
+          ),
+          GoRoute(
+            path: '/consume',
+            builder: (context, state) => const ConsumeScreen(),
+          ),
+          GoRoute(
+            path: '/favor',
+            builder: (context, state) => const FavorScreen(),
+          ),
+          GoRoute(
+            path: '/notice',
+            builder: (context, state) => const NoticeScreen(),
+          ),
+        ],
+      ),
+      debugShowCheckedModeBanner: false,
       builder: (context, child) {
-        return Directionality(
-          textDirection: TextDirection.ltr,
-          child: child ?? const SizedBox(),
+        return LoadingOverlay(
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: child ?? const SizedBox(),
+          ),
         );
       },
     );
