@@ -86,20 +86,19 @@ class LoadingOverlay extends ConsumerWidget {
         child,
         if (loadingState.isLoading)
           Material(
-            color: Colors.black.withAlpha(77),
+            color: Colors.black.withAlpha(40),
             child: Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
                 margin: const EdgeInsets.symmetric(horizontal: 48),
                 decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.grey[900] : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
+                  color: isDarkMode ? const Color(0xFF1C1C1E) : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withAlpha(26),
-                      spreadRadius: 1,
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
+                      color: Colors.black.withAlpha(10),
+                      blurRadius: 20,
+                      spreadRadius: 5,
                     ),
                   ],
                 ),
@@ -111,7 +110,11 @@ class LoadingOverlay extends ConsumerWidget {
                       height: 40,
                       child: LoadingIndicator(
                         indicatorType: Indicator.ballPulse,
-                        colors: [Colors.blue[300]!, Colors.blue[500]!, Colors.blue[700]!],
+                        colors: [
+                          isDarkMode ? const Color(0xFF4B7BFF) : const Color(0xFF2D5AF0),
+                          isDarkMode ? const Color(0xFF6C8FFF) : const Color(0xFF4169E1),
+                          isDarkMode ? const Color(0xFF89A9FF) : const Color(0xFF6384FF),
+                        ],
                         strokeWidth: 2,
                       ),
                     ),
@@ -120,9 +123,10 @@ class LoadingOverlay extends ConsumerWidget {
                       Text(
                         loadingState.message!,
                         style: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.black87,
+                          color: isDarkMode ? Colors.white : const Color(0xFF1A1F36),
                           fontSize: 14,
-                          fontFamily: '.SF Pro Text',
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.5,
                         ),
                         textAlign: TextAlign.center,
                       ),

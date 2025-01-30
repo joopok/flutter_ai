@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../components/account_list_bottom_sheet.dart';
 import '../components/custom_bottom_navigation_bar.dart';
 import '../components/custom_end_drawer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../components/loading_overlay.dart';
-
-
+import '../providers/auth_provider.dart';
+import '../theme/app_colors.dart';
+import '../constants/app_constants.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key});
@@ -16,652 +16,940 @@ class MyHomePage extends ConsumerStatefulWidget {
 }
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
-  final PageController _pageController = PageController(viewportFraction: 0.9);
-  int _currentPage = 0;
-  bool _isAmountVisible = true;
+  static const double _kAppBarElevation = 0.5;
+  static const double _kAvatarRadius = 18.0;
+  static const double _kQuickActionSize = 56.0;
+  static const double _kTransactionIconSize = 40.0;
+  static const double _kProductCardWidth = 280.0;
+  static const double _kProductCardHeight = 160.0;
+
+  final ScrollController _scrollController = ScrollController();
+  bool _isScrolled = false;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => _initializeScreen());
+    Future.microtask(_initializeScreen);
+    _scrollController.addListener(_onScroll);
   }
 
   Future<void> _initializeScreen() async {
     if (!mounted) return;
-    
-    try {
-      ref.read(loadingProvider.notifier).show(LoadingType.initializing);
-      // 여기에 초기 데이터 로딩 로직 추가
-      await Future.delayed(const Duration(milliseconds: 1000));
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('데이터 로딩 중 오류가 발생했습니다: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        ref.read(loadingProvider.notifier).hide();
-      }
-    }
+    await _loadInitialData();
   }
 
-  void _toggleAmountVisibility() {
-    setState(() {
-      _isAmountVisible = !_isAmountVisible;
-    });
+  Future<void> _loadInitialData() async {
+    try {
+      await _showLoading(() async {
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }, LoadingType.initializing);
+    } catch (e) {
+      _showErrorSnackBar('데이터 로딩 중 오류가 발생했습니다: $e');
+    }
   }
 
   Future<void> _refreshData() async {
     try {
-      await ref.read(loadingProvider.notifier).during(
+      await _showLoading(
         () => Future.delayed(const Duration(seconds: 2)),
-        type: LoadingType.refreshing,
+        LoadingType.refreshing,
       );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('새로고침 중 오류가 발생했습니다: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      _showErrorSnackBar('새로고침 중 오류가 발생했습니다: $e');
     }
   }
 
-  Future<void> _showAccountList(BuildContext context) async {
+  Future<void> _showLoading(
+      Future<void> Function() callback, LoadingType type) async {
     if (!mounted) return;
-    
-    try {
-      await ref.read(loadingProvider.notifier).during(
-        () async {
-          await showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => AccountListBottomSheet(
-              isAmountVisible: _isAmountVisible,
-              onToggleAmountVisibility: _toggleAmountVisibility,
-              onRefresh: _refreshData,
-            ),
-          );
-        },
-        type: LoadingType.accountLoading,
-      );
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('계좌 정보 로딩 중 오류가 발생했습니다: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    await ref.read(loadingProvider.notifier).during(callback, type: type);
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+  void _onScroll() {
+    if (_scrollController.offset > 0 && !_isScrolled) {
+      setState(() => _isScrolled = true);
+    } else if (_scrollController.offset <= 0 && _isScrolled) {
+      setState(() => _isScrolled = false);
     }
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final isLoading = ref.watch(loadingProvider).isLoading;
+    final authState = ref.watch(authNotifierProvider);
+    final userData = authState.userData;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Row(
+      backgroundColor: _getBackgroundColor(isDarkMode),
+      appBar: _buildAppBar(isDarkMode, userData),
+      endDrawer: const CustomEndDrawer(),
+      body: _buildBody(isDarkMode, authState),
+      bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 2),
+    );
+  }
+
+  Color _getBackgroundColor(bool isDarkMode) {
+    return isDarkMode ? AppColors.darkBackground : AppColors.lightBackground;
+  }
+
+  PreferredSizeWidget _buildAppBar(bool isDarkMode, UserData? userData) {
+    return AppBar(
+      backgroundColor: _isScrolled
+          ? (isDarkMode ? AppColors.darkSurface : Colors.white)
+          : Colors.transparent,
+      elevation: _isScrolled ? _kAppBarElevation : 0,
+      title: _AppBarTitle(userData: userData, isDarkMode: isDarkMode),
+      actions: _buildAppBarActions(isDarkMode),
+    );
+  }
+
+  List<Widget> _buildAppBarActions(bool isDarkMode) {
+    return [
+      _AppBarActionButton(
+        icon: Icons.search,
+        isDarkMode: isDarkMode,
+        onPressed: () {},
+      ),
+      _NotificationButton(isDarkMode: isDarkMode),
+      _MenuButton(isDarkMode: isDarkMode),
+    ];
+  }
+
+  Widget _buildBody(bool isDarkMode, AuthState authState) {
+    return RefreshIndicator(
+      onRefresh: _refreshData,
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '도승현님!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black87,
-              ),
+            _BalanceCard(
+              isDarkMode: isDarkMode,
+              authState: authState,
             ),
+            _QuickActions(isDarkMode: isDarkMode),
+            _TransactionHistory(isDarkMode: isDarkMode),
+            _ProductRecommendations(isDarkMode: isDarkMode),
+            _NoticeList(isDarkMode: isDarkMode),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: Image.network(
-              'https://cdn-icons-png.flaticon.com/512/2171/2171947.png',
-              width: 24,
-              height: 24,
-            ),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Dialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const CircleAvatar(
-                            radius: 50,
-                            backgroundImage: NetworkImage(
-                                'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            "홍길동",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "example@gmail.com",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  debugPrint("프로필 편집 클릭됨");
-                                },
-                                child: const Text("편집"),
-                              ),
-                              const SizedBox(width: 10),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.grey,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text("닫기"),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
+      ),
+    );
+  }
+}
+
+class _AppBarTitle extends StatelessWidget {
+  const _AppBarTitle({
+    required this.userData,
+    required this.isDarkMode,
+  });
+
+  final UserData? userData;
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: _MyHomePageState._kAvatarRadius,
+          backgroundImage: NetworkImage(
+            userData?.profileImage ?? AppConstants.defaultProfileImage,
           ),
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_none_outlined),
-                onPressed: () {
-                  context.go('/notice-list');
-                },
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  child: const Text(
-                    '2',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ],
+        ),
+        const SizedBox(width: 12),
+        Text(
+          '${userData?.name ?? ""}님',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: isDarkMode ? Colors.white : AppColors.darkText,
           ),
-          Builder(
-            builder: (BuildContext context) {
-              return IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () {
-                  Scaffold.of(context).openEndDrawer();
-                },
-              );
-            },
+        ),
+      ],
+    );
+  }
+}
+
+class _AppBarActionButton extends StatelessWidget {
+  const _AppBarActionButton({
+    required this.icon,
+    required this.isDarkMode,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final bool isDarkMode;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(
+        icon,
+        color: isDarkMode ? Colors.white : AppColors.darkText,
+      ),
+      onPressed: onPressed,
+    );
+  }
+}
+
+class _NotificationButton extends StatelessWidget {
+  const _NotificationButton({required this.isDarkMode});
+
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Stack(
+        children: [
+          Icon(
+            Icons.notifications_none,
+            color: isDarkMode ? Colors.white : AppColors.darkText,
+          ),
+          const Positioned(
+            right: 0,
+            top: 0,
+            child: _NotificationBadge(),
           ),
         ],
       ),
-      endDrawer: const CustomEndDrawer(),
-      body: RefreshIndicator(
-        onRefresh: _refreshData,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '고객님을 위한 나만의',
-                      style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        letterSpacing: -1.0,
-                        color: isDarkMode ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          '전담직원이 기다리고 있어요',
-                          style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            letterSpacing: -1.0,
-                            color: isDarkMode ? Colors.white : Colors.black87,
-                          ),
-                        ),
-                        Icon(Icons.arrow_forward,
-                          color: isDarkMode ? Colors.white : Colors.black87),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  '더보기 1',
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.grey[900] : const Color(0xFFF8E8FF),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '저축예금',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: isDarkMode ? Colors.grey[300] : Colors.black54,
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.more_horiz,
-                              color: isDarkMode ? Colors.white : Colors.black87),
-                            onPressed: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) {
-                                  return Container(
-                                    padding: const EdgeInsets.all(20),
-                                    color: isDarkMode ? Colors.grey[900] : Colors.white,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        ListTile(
-                                          leading: Icon(Icons.edit,
-                                              color: Colors.blue),
-                                          title: Text('수정하기',
-                                            style: TextStyle(
-                                              color: isDarkMode ? Colors.white : Colors.black87,
-                                            ),
-                                          ),
-                                          onTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                        ListTile(
-                                          leading: const Icon(Icons.delete,
-                                              color: Colors.red),
-                                          title: Text('삭제하기',
-                                            style: TextStyle(
-                                              color: isDarkMode ? Colors.white : Colors.black87,
-                                            ),
-                                          ),
-                                          onTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                        ListTile(
-                                          leading: Icon(Icons.close,
-                                            color: isDarkMode ? Colors.grey[400] : Colors.grey),
-                                          title: Text('닫기',
-                                            style: TextStyle(
-                                              color: isDarkMode ? Colors.white : Colors.black87,
-                                            ),
-                                          ),
-                                          onTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Text(
-                            '9,742,028원',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: isDarkMode ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '우리 122-201290-02-101',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: isDarkMode ? Colors.grey[300] : Colors.black54,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : () => _showAccountList(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: isLoading
-                      ? SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              isDarkMode ? Colors.white : Colors.grey),
-                          ),
-                        )
-                      : Text(
-                          '전체계좌보기',
-                          style: TextStyle(
-                            color: isDarkMode ? Colors.white : Colors.black,
-                              fontSize: 18,
-                            letterSpacing: -1.0,
-                          ),
-                        ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: 100,
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (int page) {
-                    setState(() {
-                      _currentPage = page;
-                    });
-                  },
-                  itemCount: 7,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                      decoration: BoxDecoration(
-                        color: isDarkMode ? Colors.grey[900] : const Color(0xFFE8F3FF),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '우리 틴틴이라면 당첨 확인!',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDarkMode ? Colors.white : Colors.black87,
-                                    ),
-                                  ),
-                                  Text(
-                                    '스타벅스 커피부터\n댕펫킹 인형까지!',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: isDarkMode ? Colors.grey[300] : Colors.black54,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Image.network(
-                              'https://cdn-icons-png.flaticon.com/512/2171/2171947.png',
-                              width: 48,
-                              height: 48,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  7,
-                  (index) => Container(
-                    width: 8,
-                    height: 8,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _currentPage == index
-                          ? Colors.blue
-                          : Colors.grey.withAlpha(77),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  '우리금융그룹 바로가기',
-                  style: TextStyle(
-                    fontSize: 18,
-                    letterSpacing: 1.0,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _MenuButton(
-                      icon: Icons.monetization_on,
-                      label: '꿀머니',
-                      color: Colors.amber,
-                      onPressed: () {},
-                    ),
-                    _MenuButton(
-                      icon: Icons.credit_card,
-                      label: '카드',
-                      color: Colors.blue,
-                      onPressed: () {},
-                    ),
-                    _MenuButton(
-                      icon: Icons.account_balance,
-                      label: '캐피탈',
-                      color: Colors.indigo,
-                      onPressed: () {},
-                    ),
-                    _MenuButton(
-                      icon: Icons.trending_up,
-                      label: '증권',
-                      color: Colors.red,
-                      onPressed: () {},
-                    ),
-                    _MenuButton(
-                      icon: Icons.savings,
-                      label: '저축은행',
-                      color: Colors.green,
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: isDarkMode ? Colors.blue : Colors.black,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      '공지',
-                      style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.white,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    '우리WON뱅킹이 새로운 모습으로 바뀌어요',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  trailing: Icon(
-                    Icons.chevron_right,
-                    color: isDarkMode ? Colors.white : Colors.black87,
-                  ),
-                  onTap: () {
-                    context.go('/notice-list');
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
+      onPressed: () => context.push('/notice-list'),
+    );
+  }
+}
+
+class _NotificationBadge extends StatelessWidget {
+  const _NotificationBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: const BoxDecoration(
+        color: Colors.red,
+        shape: BoxShape.circle,
       ),
-      bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 2),
+      constraints: const BoxConstraints(
+        minWidth: 12,
+        minHeight: 12,
+      ),
     );
   }
 }
 
 class _MenuButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onPressed;
+  const _MenuButton({required this.isDarkMode});
 
-  const _MenuButton({
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(
+        Icons.menu,
+        color: isDarkMode ? Colors.white : AppColors.darkText,
+      ),
+      onPressed: () => Scaffold.of(context).openEndDrawer(),
+    );
+  }
+}
+
+class _BalanceCard extends StatelessWidget {
+  const _BalanceCard({
+    required this.isDarkMode,
+    required this.authState,
+  });
+
+  final bool isDarkMode;
+  final AuthState authState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDarkMode ? AppColors.darkGradient : AppColors.lightGradient,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(26),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _BalanceHeader(authState: authState),
+          const SizedBox(height: 8),
+          _BalanceAmount(authState: authState),
+          const SizedBox(height: 16),
+          _AccountInfo(),
+        ],
+      ),
+    );
+  }
+}
+
+class _BalanceHeader extends StatelessWidget {
+  const _BalanceHeader({required this.authState});
+
+  final AuthState authState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          '총 자산',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Consumer(
+          builder: (context, ref, _) => IconButton(
+            icon: Icon(
+              authState.isAmountVisible
+                  ? Icons.visibility
+                  : Icons.visibility_off,
+              color: Colors.white,
+              size: 20,
+            ),
+            onPressed: () => ref
+                .read(authNotifierProvider.notifier)
+                .toggleAmountVisibility(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BalanceAmount extends StatelessWidget {
+  const _BalanceAmount({required this.authState});
+
+  final AuthState authState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      authState.isAmountVisible ? '₩12,345,678' : '********',
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 28,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+}
+
+class _AccountInfo extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          '우리 입출금 | 1234-567-890123',
+          style: TextStyle(
+            color: Colors.white.withAlpha(204),
+            fontSize: 14,
+          ),
+        ),
+        const Spacer(),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white.withAlpha(51),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Text(
+            '전체보기',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _QuickActions extends StatelessWidget {
+  const _QuickActions({required this.isDarkMode});
+
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _QuickActionButton(
+            icon: Icons.account_balance_wallet,
+            label: '이체',
+            isDarkMode: isDarkMode,
+            onTap: () {},
+          ),
+          _QuickActionButton(
+            icon: Icons.qr_code_scanner,
+            label: 'QR결제',
+            isDarkMode: isDarkMode,
+            onTap: () {},
+          ),
+          _QuickActionButton(
+            icon: Icons.savings,
+            label: '예금·적금',
+            isDarkMode: isDarkMode,
+            onTap: () {},
+          ),
+          _QuickActionButton(
+            icon: Icons.currency_exchange,
+            label: '환전',
+            isDarkMode: isDarkMode,
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuickActionButton extends StatelessWidget {
+  const _QuickActionButton({
     required this.icon,
     required this.label,
-    required this.color,
-    required this.onPressed,
+    required this.isDarkMode,
+    required this.onTap,
   });
+
+  final IconData icon;
+  final String label;
+  final bool isDarkMode;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: _MyHomePageState._kQuickActionSize,
+            height: _MyHomePageState._kQuickActionSize,
+            decoration: BoxDecoration(
+              color: isDarkMode ? AppColors.darkSurface : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color:
+                    isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
+              ),
+            ),
+            child: Icon(
+              icon,
+              color: isDarkMode ? AppColors.primary : AppColors.secondary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDarkMode ? Colors.white : AppColors.darkText,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TransactionHistory extends StatelessWidget {
+  const _TransactionHistory({required this.isDarkMode});
+
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDarkMode ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _TransactionHeader(isDarkMode: isDarkMode),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              final isExpense = index % 2 == 0;
+              return _TransactionItem(
+                date: '2024.03.${20 - index}',
+                title: isExpense ? '스타벅스 강남점' : '급여',
+                amount: isExpense ? '- ₩5,800' : '+ ₩3,500,000',
+                isExpense: isExpense,
+                isDarkMode: isDarkMode,
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TransactionHeader extends StatelessWidget {
+  const _TransactionHeader({required this.isDarkMode});
+
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          '최근 거래내역',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : AppColors.darkText,
+          ),
+        ),
+        TextButton(
+          onPressed: () {},
+          child: Text(
+            '전체보기',
+            style: TextStyle(
+              color: isDarkMode ? AppColors.primary : AppColors.secondary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TransactionItem extends StatelessWidget {
+  const _TransactionItem({
+    required this.date,
+    required this.title,
+    required this.amount,
+    required this.isExpense,
+    required this.isDarkMode,
+  });
+
+  final String date;
+  final String title;
+  final String amount;
+  final bool isExpense;
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          _TransactionIcon(
+            isExpense: isExpense,
+            isDarkMode: isDarkMode,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _TransactionDetails(
+              title: title,
+              date: date,
+              isDarkMode: isDarkMode,
+            ),
+          ),
+          _TransactionAmount(
+            amount: amount,
+            isExpense: isExpense,
+            isDarkMode: isDarkMode,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TransactionIcon extends StatelessWidget {
+  const _TransactionIcon({
+    required this.isExpense,
+    required this.isDarkMode,
+  });
+
+  final bool isExpense;
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: _MyHomePageState._kTransactionIconSize,
+      height: _MyHomePageState._kTransactionIconSize,
+      decoration: BoxDecoration(
+        color: isExpense
+            ? (isDarkMode ? AppColors.darkSurface : AppColors.lightBackground)
+            : (isDarkMode ? AppColors.darkAccent : AppColors.lightAccent),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(
+        isExpense ? Icons.arrow_upward : Icons.arrow_downward,
+        color: isExpense
+            ? (isDarkMode ? Colors.white : AppColors.darkText)
+            : (isDarkMode ? AppColors.primary : AppColors.secondary),
+      ),
+    );
+  }
+}
+
+class _TransactionDetails extends StatelessWidget {
+  const _TransactionDetails({
+    required this.title,
+    required this.date,
+    required this.isDarkMode,
+  });
+
+  final String title;
+  final String date;
+  final bool isDarkMode;
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: color.withAlpha(25),
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Icon(
-            icon,
-            color: color,
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: isDarkMode ? Colors.white : AppColors.darkText,
           ),
         ),
-        const SizedBox(height: 4),
         Text(
-          label,
-          style: const TextStyle(
+          date,
+          style: TextStyle(
             fontSize: 12,
+            color: isDarkMode
+                ? AppColors.darkSecondaryText
+                : AppColors.lightSecondaryText,
           ),
         ),
       ],
+    );
+  }
+}
+
+class _TransactionAmount extends StatelessWidget {
+  const _TransactionAmount({
+    required this.amount,
+    required this.isExpense,
+    required this.isDarkMode,
+  });
+
+  final String amount;
+  final bool isExpense;
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      amount,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: isExpense
+            ? AppColors.error
+            : (isDarkMode ? AppColors.primary : AppColors.secondary),
+      ),
+    );
+  }
+}
+
+class _ProductRecommendations extends StatelessWidget {
+  const _ProductRecommendations({required this.isDarkMode});
+
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '추천 상품',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : AppColors.darkText,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: _MyHomePageState._kProductCardHeight,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                const _ProductCard(
+                  title: '우리 급여통장',
+                  description: '급여 고객을 위한\n특별한 혜택',
+                  color: AppColors.primary,
+                ),
+                const _ProductCard(
+                  title: '우리 주거래통장',
+                  description: '수수료 면제 혜택으로\n편리한 금융생활',
+                  color: AppColors.secondary,
+                ),
+                const _ProductCard(
+                  title: '우리 청년통장',
+                  description: '청년을 위한\n자산형성 프로그램',
+                  color: AppColors.accent,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NoticeList extends StatelessWidget {
+  const _NoticeList({required this.isDarkMode});
+
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDarkMode ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '공지사항',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : AppColors.darkText,
+                ),
+              ),
+              TextButton(
+                onPressed: () => context.go('/notice-list'),
+                child: Text(
+                  '전체보기',
+                  style: TextStyle(
+                    color: isDarkMode ? AppColors.primary : AppColors.secondary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _NoticeItem(
+            title: '[안내] 우리은행 앱 업데이트 안내',
+            date: '2024.03.20',
+            isDarkMode: isDarkMode,
+            onTap: () => context.push('/notice/1'),
+          ),
+          _NoticeItem(
+            title: '[이벤트] 신규 가입 고객 이벤트',
+            date: '2024.03.19',
+            isDarkMode: isDarkMode,
+            onTap: () => context.push('/notice/2'),
+          ),
+          _NoticeItem(
+            title: '[안내] 시스템 점검 안내',
+            date: '2024.03.18',
+            isDarkMode: isDarkMode,
+            onTap: () => context.push('/notice/3'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NoticeItem extends StatelessWidget {
+  const _NoticeItem({
+    required this.title,
+    required this.date,
+    required this.isDarkMode,
+    required this.onTap,
+  });
+
+  final String title;
+  final String date;
+  final bool isDarkMode;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
+            ),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDarkMode ? Colors.white : AppColors.darkText,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Text(
+              date,
+              style: TextStyle(
+                fontSize: 12,
+                color: isDarkMode
+                    ? AppColors.darkSecondaryText
+                    : AppColors.lightSecondaryText,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProductCard extends StatelessWidget {
+  const _ProductCard({
+    required this.title,
+    required this.description,
+    required this.color,
+  });
+
+  final String title;
+  final String description;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: _MyHomePageState._kProductCardWidth,
+      margin: const EdgeInsets.only(right: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color,
+            color.withAlpha(204),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: TextStyle(
+              color: Colors.white.withAlpha(204),
+              fontSize: 14,
+              height: 1.5,
+            ),
+          ),
+          const Spacer(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha(51),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text(
+              '자세히 보기',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -276,8 +276,12 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: isDarkMode ? const Color(0xFF2C2C2E) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isDarkMode ? const Color(0xFF3A3A3C) : const Color(0xFFE5E7EC),
+                  width: 1,
+                ),
               ),
               child: Row(
                 children: [
@@ -285,11 +289,12 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           '자산목표설정',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : const Color(0xFF1B1D1F),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -297,7 +302,8 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           '자산 등록하고 목표를 세워보세요.\n자산관리는 부자되는 지름길!',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[700],
+                            color: isDarkMode ? const Color(0xFF8E8E93) : const Color(0xFF666666),
+                            height: 1.4,
                           ),
                         ),
                       ],
@@ -307,6 +313,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                     'assets/icons/target.png',
                     width: 60,
                     height: 60,
+                    color: isDarkMode ? Colors.white : null,
                     errorBuilder: (context, error, stackTrace) {
                       return Icon(
                         Icons.track_changes,
@@ -323,8 +330,12 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: isDarkMode ? const Color(0xFF2C2C2E) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isDarkMode ? const Color(0xFF3A3A3C) : const Color(0xFFE5E7EC),
+                  width: 1,
+                ),
               ),
               child: Row(
                 children: [
@@ -332,11 +343,12 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           '월말리포트',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : const Color(0xFF1B1D1F),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -344,7 +356,8 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           '매달 제공되는 자산분석리포트로\n내자산을 관리해 보세요',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[700],
+                            color: isDarkMode ? const Color(0xFF8E8E93) : const Color(0xFF666666),
+                            height: 1.4,
                           ),
                         ),
                       ],
@@ -354,6 +367,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                     'assets/icons/calendar.png',
                     width: 60,
                     height: 60,
+                    color: isDarkMode ? Colors.white : null,
                     errorBuilder: (context, error, stackTrace) {
                       return Icon(
                         Icons.calendar_today,

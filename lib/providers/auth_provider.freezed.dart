@@ -129,7 +129,7 @@ class __$$UserDataImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$UserDataImpl implements _UserData {
+class _$UserDataImpl with DiagnosticableTreeMixin implements _UserData {
   const _$UserDataImpl(
       {required this.id, required this.name, this.email, this.profileImage});
 
@@ -143,8 +143,19 @@ class _$UserDataImpl implements _UserData {
   final String? profileImage;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'UserData(id: $id, name: $name, email: $email, profileImage: $profileImage)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'UserData'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('email', email))
+      ..add(DiagnosticsProperty('profileImage', profileImage));
   }
 
   @override
@@ -350,7 +361,7 @@ class __$$AuthStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$AuthStateImpl implements _AuthState {
+class _$AuthStateImpl with DiagnosticableTreeMixin implements _AuthState {
   const _$AuthStateImpl(
       {this.isLoading = false,
       this.isAuthenticated = false,
@@ -373,8 +384,20 @@ class _$AuthStateImpl implements _AuthState {
   final String? errorMessage;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'AuthState(isLoading: $isLoading, isAuthenticated: $isAuthenticated, isAmountVisible: $isAmountVisible, userData: $userData, errorMessage: $errorMessage)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'AuthState'))
+      ..add(DiagnosticsProperty('isLoading', isLoading))
+      ..add(DiagnosticsProperty('isAuthenticated', isAuthenticated))
+      ..add(DiagnosticsProperty('isAmountVisible', isAmountVisible))
+      ..add(DiagnosticsProperty('userData', userData))
+      ..add(DiagnosticsProperty('errorMessage', errorMessage));
   }
 
   @override

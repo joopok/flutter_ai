@@ -23,7 +23,7 @@ class CustomBottomNavigationBar extends ConsumerWidget {
       currentIndex: currentIndex,
       onTap: (index) async {
         ref.read(loadingProvider.notifier).show(LoadingType.navigating);
-
+        debugPrint('index: $index');
         switch (index) {
           case 0:
             context.go('/product');

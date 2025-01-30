@@ -39,7 +39,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
 
   Future<void> _initializeScreen() async {
     if (!mounted) return;
-    
+
     try {
       ref.read(loadingProvider.notifier).show(LoadingType.productLoading);
       // 여기에 상품 데이터 로딩 로직 추가
@@ -72,8 +72,8 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, 
-              color: isDarkMode ? Colors.white : Colors.black87),
+            icon: Icon(Icons.arrow_back,
+                color: isDarkMode ? Colors.white : Colors.black87),
             onPressed: () => context.go('/'),
           ),
           title: Text(
@@ -224,7 +224,8 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
     );
   }
 
-  Widget _buildLargeMenuItem(BuildContext context, {
+  Widget _buildLargeMenuItem(
+    BuildContext context, {
     required String title,
     required String subtitle,
     bool isBlue = false,
@@ -237,9 +238,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode 
-              ? Colors.black26 
-              : Colors.grey.withAlpha(25),
+            color: isDarkMode ? Colors.black26 : Colors.grey.withAlpha(25),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -285,7 +284,8 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, {
+  Widget _buildMenuItem(
+    BuildContext context, {
     required String title,
     required String subtitle,
   }) {
@@ -297,9 +297,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode 
-              ? Colors.black26 
-              : Colors.grey.withAlpha(25),
+            color: isDarkMode ? Colors.black26 : Colors.grey.withAlpha(25),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -366,9 +364,9 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  isDarkMode 
-                    ? Colors.black.withAlpha(150)
-                    : Colors.black.withAlpha(77),
+                  isDarkMode
+                      ? Colors.black.withAlpha(150)
+                      : Colors.black.withAlpha(77),
                 ],
               ),
             ),
@@ -409,9 +407,9 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isDarkMode 
-          ? Colors.black.withAlpha(150)
-          : Colors.black.withAlpha(77),
+        color: isDarkMode
+            ? Colors.black.withAlpha(150)
+            : Colors.black.withAlpha(77),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(

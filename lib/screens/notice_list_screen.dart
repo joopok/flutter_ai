@@ -64,7 +64,8 @@ class NoticeListScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
+                      const Icon(Icons.calendar_today,
+                          size: 14, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
                         notice['date'] as String,
@@ -93,9 +94,9 @@ class NoticeListScreen extends StatelessWidget {
                             horizontal: 8,
                             vertical: 4,
                           ),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.red,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
                           child: const Text(
                             'NEW',
@@ -111,7 +112,7 @@ class NoticeListScreen extends StatelessWidget {
                 ],
               ),
               onTap: () {
-                context.push('/notice');
+                context.push('/notice/${notice['id']}');
               },
             ),
           );
