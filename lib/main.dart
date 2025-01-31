@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'providers/auth_provider.dart';
 import 'providers/theme_provider.dart';
-import 'package:go_router/go_router.dart';
 import 'screens/home.dart';
 import 'screens/asset.dart';
 import 'screens/product.dart';
@@ -18,20 +14,13 @@ import 'screens/login_screen.dart';
 import 'screens/splash_screen.dart';
 import 'components/loading_overlay.dart';
 import 'theme/app_theme.dart' as app_theme;
-import 'screens/product.dart';
-import 'screens/asset.dart';
-import 'screens/consume.dart';
 import 'screens/consume_detail.dart';
-import 'screens/favor.dart';
-import 'screens/splash_screen.dart';
-import 'screens/notice.dart';
 import 'screens/notice_list_screen.dart';
 import 'screens/event_screen.dart';
 import 'screens/workplace_screen.dart';
 import 'screens/esports_screen.dart';
 import 'screens/teen_screen.dart';
-import 'screens/login_screen.dart';
-import 'providers/auth_provider.dart';
+import 'package:flutter/services.dart';
 
 
 
@@ -48,6 +37,11 @@ void main() async {
   if (!isAuthenticated || userId == null || userName == null) {
     await sharedPreferences.clear();
   }
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   
   runApp(
     const ProviderScope(
@@ -57,7 +51,6 @@ void main() async {
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
-  debugPrint('routerProvider.....aSSSSSS');
   final router = GoRouter(
     initialLocation: '/splash',
     routes: [

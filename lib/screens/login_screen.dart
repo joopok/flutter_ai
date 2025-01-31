@@ -110,7 +110,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           : AppColors.lightGradient,
                       ),
                       image: const DecorationImage(
-                        image: AssetImage('assets/images/login_pattern.png'),
+                        image: AssetImage('assets/images/login_pattern.jpeg'),
                         fit: BoxFit.cover,
                         opacity: 0.1,
                       ),
@@ -139,7 +139,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          'WON Banking',
+                          'SANG SANG Banking',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
