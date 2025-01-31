@@ -43,7 +43,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
     try {
       ref.read(loadingProvider.notifier).show(LoadingType.productLoading);
       // 여기에 상품 데이터 로딩 로직 추가
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 1000));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

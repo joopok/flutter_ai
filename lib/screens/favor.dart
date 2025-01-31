@@ -28,7 +28,7 @@ class _FavorScreenState extends ConsumerState<FavorScreen> with SingleTickerProv
     try {
       ref.read(loadingProvider.notifier).show(LoadingType.benefitLoading);
       // 여기에 혜택 데이터 로딩 로직 추가
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 1000));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

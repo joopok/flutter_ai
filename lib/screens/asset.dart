@@ -21,11 +21,11 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
 
   Future<void> _initializeScreen() async {
     if (!mounted) return;
-    
+
     try {
       ref.read(loadingProvider.notifier).show(LoadingType.assetLoading);
       // 여기에 자산 데이터 로딩 로직 추가
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 1000));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -53,7 +53,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back,
-            color: isDarkMode ? Colors.white : Colors.black87),
+          color: isDarkMode ? Colors.white : Colors.black87),
           onPressed: () => context.go('/'),
         ),
         title: Text(
@@ -93,10 +93,13 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey[900] : Theme.of(context).cardColor,
+                color:
+                    isDarkMode ? Colors.grey[900] : Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isDarkMode ? Colors.grey[800]! : Theme.of(context).dividerColor,
+                  color: isDarkMode
+                      ? Colors.grey[800]!
+                      : Theme.of(context).dividerColor,
                 ),
               ),
               child: Column(
@@ -142,7 +145,9 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           style: TextStyle(
                             fontSize: 14,
                             height: 1.4,
-                            color: isDarkMode ? Colors.grey[300] : Colors.blue[900],
+                            color: isDarkMode
+                                ? Colors.grey[300]
+                                : Colors.blue[900],
                           ),
                         ),
                       ],
@@ -215,7 +220,8 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                       color: isDarkMode ? Colors.grey[900] : Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+                        color:
+                            isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
                       ),
                     ),
                     child: Column(
@@ -228,7 +234,8 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: isDarkMode ? Colors.white : Colors.black87,
+                                color:
+                                    isDarkMode ? Colors.white : Colors.black87,
                               ),
                             ),
                             const Text(
@@ -244,7 +251,8 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: isDarkMode ? Colors.white : Colors.black87,
+                                color:
+                                    isDarkMode ? Colors.white : Colors.black87,
                               ),
                             ),
                           ],
@@ -255,11 +263,14 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                             Container(
                               height: 200,
                               decoration: BoxDecoration(
-                                color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                                color: isDarkMode
+                                    ? Colors.grey[800]
+                                    : Colors.grey[100],
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: CustomPaint(
-                                painter: BarChartPainter(isDarkMode: isDarkMode),
+                                painter:
+                                    BarChartPainter(isDarkMode: isDarkMode),
                                 size: const Size(double.infinity, 200),
                               ),
                             ),
@@ -279,7 +290,9 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                 color: isDarkMode ? const Color(0xFF2C2C2E) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isDarkMode ? const Color(0xFF3A3A3C) : const Color(0xFFE5E7EC),
+                  color: isDarkMode
+                      ? const Color(0xFF3A3A3C)
+                      : const Color(0xFFE5E7EC),
                   width: 1,
                 ),
               ),
@@ -294,7 +307,9 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: isDarkMode ? Colors.white : const Color(0xFF1B1D1F),
+                            color: isDarkMode
+                                ? Colors.white
+                                : const Color(0xFF1B1D1F),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -302,7 +317,9 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           '자산 등록하고 목표를 세워보세요.\n자산관리는 부자되는 지름길!',
                           style: TextStyle(
                             fontSize: 14,
-                            color: isDarkMode ? const Color(0xFF8E8E93) : const Color(0xFF666666),
+                            color: isDarkMode
+                                ? const Color(0xFF8E8E93)
+                                : const Color(0xFF666666),
                             height: 1.4,
                           ),
                         ),
@@ -333,7 +350,9 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                 color: isDarkMode ? const Color(0xFF2C2C2E) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isDarkMode ? const Color(0xFF3A3A3C) : const Color(0xFFE5E7EC),
+                  color: isDarkMode
+                      ? const Color(0xFF3A3A3C)
+                      : const Color(0xFFE5E7EC),
                   width: 1,
                 ),
               ),
@@ -348,7 +367,9 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: isDarkMode ? Colors.white : const Color(0xFF1B1D1F),
+                            color: isDarkMode
+                                ? Colors.white
+                                : const Color(0xFF1B1D1F),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -356,7 +377,9 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           '매달 제공되는 자산분석리포트로\n내자산을 관리해 보세요',
                           style: TextStyle(
                             fontSize: 14,
-                            color: isDarkMode ? const Color(0xFF8E8E93) : const Color(0xFF666666),
+                            color: isDarkMode
+                                ? const Color(0xFF8E8E93)
+                                : const Color(0xFF666666),
                             height: 1.4,
                           ),
                         ),
@@ -430,7 +453,8 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                               return Icon(
                                 Icons.bar_chart,
                                 size: 20,
-                                color: isDarkMode ? Colors.white : Colors.black87,
+                                color:
+                                    isDarkMode ? Colors.white : Colors.black87,
                               );
                             },
                           ),
@@ -457,22 +481,23 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
     );
   }
 
-  Widget _buildCategoryButton(String text, {bool isSelected = false, required bool isDarkMode}) {
+  Widget _buildCategoryButton(String text,
+      {bool isSelected = false, required bool isDarkMode}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       child: TextButton(
         onPressed: () {},
         style: TextButton.styleFrom(
-          backgroundColor: isSelected 
-            ? (isDarkMode ? Colors.blue[900] : Colors.blue) 
-            : Colors.transparent,
+          backgroundColor: isSelected
+              ? (isDarkMode ? Colors.blue[900] : Colors.blue)
+              : Colors.transparent,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
             side: BorderSide(
-              color: isSelected 
-                ? (isDarkMode ? Colors.blue[800]! : Colors.blue) 
-                : (isDarkMode ? Colors.grey[700]! : Colors.grey[400]!),
+              color: isSelected
+                  ? (isDarkMode ? Colors.blue[800]! : Colors.blue)
+                  : (isDarkMode ? Colors.grey[700]! : Colors.grey[400]!),
             ),
           ),
         ),
@@ -528,4 +553,4 @@ class BarChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
-} 
+}

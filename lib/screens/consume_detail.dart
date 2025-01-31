@@ -43,4 +43,4 @@ class ConsumeDetailScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

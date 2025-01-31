@@ -31,9 +31,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       try {
         await ref.read(authNotifierProvider.notifier).login(
-          _idController.text,
-          _passwordController.text,
-        );
+              _idController.text,
+              _passwordController.text,
+            );
 
         final authState = ref.read(authNotifierProvider);
         if (authState.errorMessage != null) {
@@ -95,19 +95,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Form(
               key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 60),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 60),
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: isDarkMode 
-                          ? AppColors.darkGradient 
-                          : AppColors.lightGradient,
+                        colors: isDarkMode
+                            ? AppColors.darkGradient
+                            : AppColors.lightGradient,
                       ),
                       image: const DecorationImage(
                         image: AssetImage('assets/images/login_pattern.jpeg'),
@@ -164,7 +164,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       color: isDarkMode ? AppColors.darkSurface : Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
+                        color: isDarkMode
+                            ? AppColors.darkBorder
+                            : AppColors.lightBorder,
                       ),
                     ),
                     child: Column(
@@ -173,37 +175,50 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextFormField(
                           controller: _idController,
                           style: TextStyle(
-                            color: isDarkMode ? Colors.white : AppColors.darkText,
+                            color:
+                                isDarkMode ? Colors.white : AppColors.darkText,
                           ),
                           decoration: InputDecoration(
                             labelText: '아이디',
                             labelStyle: TextStyle(
-                              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : Colors.grey[600],
                             ),
                             hintText: '아이디를 입력하세요',
                             hintStyle: TextStyle(
-                              color: isDarkMode ? Colors.white30 : Colors.grey[400],
+                              color: isDarkMode
+                                  ? Colors.white30
+                                  : Colors.grey[400],
                             ),
                             prefixIcon: Icon(
                               Icons.person_outline,
-                              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : Colors.grey[600],
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                color: isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
+                                color: isDarkMode
+                                    ? AppColors.darkBorder
+                                    : AppColors.lightBorder,
                               ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                color: isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
+                                color: isDarkMode
+                                    ? AppColors.darkBorder
+                                    : AppColors.lightBorder,
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                color: isDarkMode ? AppColors.primary : AppColors.secondary,
+                                color: isDarkMode
+                                    ? AppColors.primary
+                                    : AppColors.secondary,
                                 width: 2,
                               ),
                             ),
@@ -220,25 +235,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           controller: _passwordController,
                           obscureText: !_isPasswordVisible,
                           style: TextStyle(
-                            color: isDarkMode ? Colors.white : AppColors.darkText,
+                            color:
+                                isDarkMode ? Colors.white : AppColors.darkText,
                           ),
                           decoration: InputDecoration(
                             labelText: '비밀번호',
                             labelStyle: TextStyle(
-                              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : Colors.grey[600],
                             ),
                             hintText: '비밀번호를 입력하세요',
                             hintStyle: TextStyle(
-                              color: isDarkMode ? Colors.white30 : Colors.grey[400],
+                              color: isDarkMode
+                                  ? Colors.white30
+                                  : Colors.grey[400],
                             ),
                             prefixIcon: Icon(
                               Icons.lock_outline,
-                              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : Colors.grey[600],
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-                                color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                                _isPasswordVisible
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : Colors.grey[600],
                               ),
                               onPressed: () {
                                 setState(() {
@@ -249,19 +275,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                color: isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
+                                color: isDarkMode
+                                    ? AppColors.darkBorder
+                                    : AppColors.lightBorder,
                               ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                color: isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
+                                color: isDarkMode
+                                    ? AppColors.darkBorder
+                                    : AppColors.lightBorder,
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                color: isDarkMode ? AppColors.primary : AppColors.secondary,
+                                color: isDarkMode
+                                    ? AppColors.primary
+                                    : AppColors.secondary,
                                 width: 2,
                               ),
                             ),
@@ -277,47 +309,57 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ElevatedButton(
                           onPressed: authState.isLoading ? null : _handleLogin,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: isDarkMode ? AppColors.primary : AppColors.secondary,
+                            backgroundColor: isDarkMode
+                                ? AppColors.primary
+                                : AppColors.secondary,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                           child: const Text(
-                          '로그인',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            '로그인',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
-                ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       _buildTextButton('아이디 찾기', isDarkMode),
                       _buildDivider(isDarkMode),
                       _buildTextButton('비밀번호 찾기', isDarkMode),
                       _buildDivider(isDarkMode),
                       _buildTextButton('회원가입', isDarkMode),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildTextButton('API 테스트', isDarkMode, onPressed: () {
+                        context.push('/api-test');
+                      }),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTextButton(String text, bool isDarkMode) {
+  Widget _buildTextButton(String text, bool isDarkMode, {VoidCallback? onPressed}) {
     return TextButton(
-      onPressed: () {},
+      onPressed: onPressed ?? () {},
       style: TextButton.styleFrom(
         foregroundColor: isDarkMode ? Colors.white70 : Colors.grey[600],
       ),
@@ -336,4 +378,4 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
     );
   }
-} 
+}

@@ -57,7 +57,7 @@ class BenefitScreenState extends State<BenefitScreen> {
                     BoxShadow(
                       color: isDarkMode 
                         ? Colors.black26 
-                        : Colors.grey.withOpacity(0.1),
+                        : Colors.grey.withAlpha(25),
                       spreadRadius: 0,
                       blurRadius: 10,
                     ),
@@ -98,7 +98,7 @@ class BenefitScreenState extends State<BenefitScreen> {
                     BoxShadow(
                       color: isDarkMode 
                         ? Colors.black26 
-                        : Colors.grey.withOpacity(0.1),
+                        : Colors.grey.withAlpha(25),
                       spreadRadius: 0,
                       blurRadius: 10,
                     ),

@@ -20,7 +20,9 @@ import 'screens/event_screen.dart';
 import 'screens/workplace_screen.dart';
 import 'screens/esports_screen.dart';
 import 'screens/teen_screen.dart';
+import 'screens/benefit.dart';
 import 'package:flutter/services.dart';
+import 'screens/api_test_screen.dart';
 
 
 
@@ -121,17 +123,28 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/teen',
         builder: (context, state) => const TeenScreen(),
       ),
+      GoRoute(
+        path: '/api-test',
+        builder: (context, state) => const ApiTestScreen(),
+        redirect: (context, state) => null,
+      ),
+      GoRoute(
+        path: '/benefit',
+        builder: (context, state) => const BenefitScreen(),
+        redirect: (context, state) => null,
+      ),
     ],
     redirect: (context, state) {
       final isAuthenticated = ref.read(authNotifierProvider).isAuthenticated;
       final isLoggingIn = state.matchedLocation == '/login';
       final isSplash = state.matchedLocation == '/splash';
+      final isApiTest = state.matchedLocation == '/api-test';
 
-      // 스플래시 화면에서는 리다이렉트하지 않음
+      if (isApiTest) return null;
+
       if (isSplash) return null;
 
       if (!isAuthenticated && !isLoggingIn) {
-        debugPrint('22222routerProvider.....DDDDD');
         return '/login';
       }
 

@@ -414,27 +414,35 @@ class _QuickActions extends StatelessWidget {
         children: [
           _QuickActionButton(
             icon: Icons.account_balance_wallet,
-            label: '이체',
+            label: 'API테스트',
             isDarkMode: isDarkMode,
-            onTap: () {},
+            onTap: () {
+               context.push('/api-test');
+            },
           ),
           _QuickActionButton(
             icon: Icons.qr_code_scanner,
-            label: 'QR결제',
+            label: 'e스포츠관',
             isDarkMode: isDarkMode,
-            onTap: () {},
+            onTap: () {
+              context.push('/esports');
+            },
           ),
           _QuickActionButton(
             icon: Icons.savings,
-            label: '예금·적금',
+            label: '이벤트',
             isDarkMode: isDarkMode,
-            onTap: () {},
+            onTap: () {
+              context.go('/event');
+            },
           ),
           _QuickActionButton(
             icon: Icons.currency_exchange,
-            label: '환전',
+            label: '베넷핏',
             isDarkMode: isDarkMode,
-            onTap: () {},
+            onTap: () {
+              context.go('/benefit');
+            },
           ),
         ],
       ),
@@ -736,18 +744,18 @@ class _ProductRecommendations extends StatelessWidget {
             height: _MyHomePageState._kProductCardHeight,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              children: [
-                const _ProductCard(
+              children:const [
+                _ProductCard(
                   title: '우리 급여통장',
                   description: '급여 고객을 위한\n특별한 혜택',
                   color: AppColors.primary,
                 ),
-                const _ProductCard(
+                _ProductCard(
                   title: '우리 주거래통장',
                   description: '수수료 면제 혜택으로\n편리한 금융생활',
                   color: AppColors.secondary,
                 ),
-                const _ProductCard(
+                _ProductCard(
                   title: '우리 청년통장',
                   description: '청년을 위한\n자산형성 프로그램',
                   color: AppColors.accent,

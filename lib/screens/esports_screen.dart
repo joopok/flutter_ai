@@ -10,7 +10,7 @@ class EsportsScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/favor'),
+          onPressed: () => context.go('/home'),
         ),
         title: const Text(
           'e스포츠관',

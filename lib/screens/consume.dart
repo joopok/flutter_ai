@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'dart:ui';
 import 'package:intl/date_symbol_data_local.dart';
-import 'dart:math';  // dart:math 패키지 추가
+import 'dart:math'; // dart:math 패키지 추가
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../components/loading_overlay.dart';
 
@@ -17,7 +17,8 @@ class ConsumeScreen extends ConsumerStatefulWidget {
   ConsumerState<ConsumeScreen> createState() => _ConsumeScreenState();
 }
 
-class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTickerProviderStateMixin {
+class _ConsumeScreenState extends ConsumerState<ConsumeScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _showReconnectDialog = true;
   DateTime _selectedDate = DateTime.now();
@@ -27,16 +28,16 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
 
   // 소비 데이터를 저장할 Map (날짜별 소비금액)
   final Map<DateTime, int> _consumeData = {
-    DateTime(2024, 1, 15): 30000,    // 3만원
-    DateTime(2024, 1, 23): 696974,   // 696,974원
-    DateTime(2024, 1, 28): 1540000,  // 154만원
+    DateTime(2024, 1, 15): 30000, // 3만원
+    DateTime(2024, 1, 23): 696974, // 696,974원
+    DateTime(2024, 1, 28): 1540000, // 154만원
   };
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    initializeDateFormatting('ko_KR', null);  // 한국어 로케일 초기화
+    initializeDateFormatting('ko_KR', null); // 한국어 로케일 초기화
     Future.microtask(() => _initializeScreen());
   }
 
@@ -48,11 +49,11 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
 
   Future<void> _initializeScreen() async {
     if (!mounted) return;
-    
+
     try {
       ref.read(loadingProvider.notifier).show(LoadingType.consumeLoading);
       // 여기에 소비 데이터 로딩 로직 추가
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 1000));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -82,7 +83,7 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back,
-              color: isDarkMode ? Colors.white : Colors.black87),
+                color: isDarkMode ? Colors.white : Colors.black87),
             onPressed: () => context.go('/'),
           ),
           title: Text(
@@ -97,7 +98,7 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
             Builder(
               builder: (context) => IconButton(
                 icon: Icon(Icons.menu,
-                  color: isDarkMode ? Colors.white : Colors.black87),
+                    color: isDarkMode ? Colors.white : Colors.black87),
                 onPressed: () {
                   Scaffold.of(context).openEndDrawer();
                 },
@@ -165,9 +166,9 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: isDarkMode 
-                        ? Colors.black26 
-                        : Colors.grey.withAlpha(26),
+                      color: isDarkMode
+                          ? Colors.black26
+                          : Colors.grey.withAlpha(26),
                       spreadRadius: 1,
                       blurRadius: 6,
                     ),
@@ -198,7 +199,9 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                             '자산조회기간이 만료되어\n최신정보를 확인할 수 없습니다.',
                             style: TextStyle(
                               fontSize: 14,
-                              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                              color: isDarkMode
+                                  ? Colors.grey[400]
+                                  : Colors.grey[600],
                               height: 1.3,
                             ),
                           ),
@@ -207,7 +210,7 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                     ),
                     IconButton(
                       icon: Icon(Icons.close,
-                        color: isDarkMode ? Colors.white : Colors.black87),
+                          color: isDarkMode ? Colors.white : Colors.black87),
                       onPressed: () {
                         setState(() {
                           _showReconnectDialog = false;
@@ -229,8 +232,10 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.arrow_back_ios, size: 16,
-                            color: isDarkMode ? Colors.white : Colors.black87),
+                          Icon(Icons.arrow_back_ios,
+                              size: 16,
+                              color:
+                                  isDarkMode ? Colors.white : Colors.black87),
                           Text(
                             '1월',
                             style: TextStyle(
@@ -239,15 +244,18 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                               color: isDarkMode ? Colors.white : Colors.black87,
                             ),
                           ),
-                          Icon(Icons.arrow_forward_ios, size: 16,
-                            color: isDarkMode ? Colors.white : Colors.black87),
+                          Icon(Icons.arrow_forward_ios,
+                              size: 16,
+                              color:
+                                  isDarkMode ? Colors.white : Colors.black87),
                         ],
                       ),
                       Text(
                         '2025.01.28 11:03',
                         style: TextStyle(
                           fontSize: 14,
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                          color:
+                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
                         ),
                       ),
                     ],
@@ -285,15 +293,16 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: BorderSide(
-                    color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!),
+                      color:
+                          isDarkMode ? Colors.grey[700]! : Colors.grey[300]!),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
                 child: Text('전체 소비내역 보기',
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
-                  )),
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    )),
               ),
             ),
 
@@ -390,7 +399,8 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                         '4건',
                         style: TextStyle(
                           fontSize: 14,
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                          color:
+                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
                         ),
                       ),
                     ],
@@ -402,7 +412,9 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                       color: isDarkMode ? Colors.grey[900] : Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!),
+                          color: isDarkMode
+                              ? Colors.grey[800]!
+                              : Colors.grey[200]!),
                     ),
                     child: Column(
                       children: [
@@ -415,7 +427,8 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                         ),
                         Divider(
                           height: 32,
-                          color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                          color:
+                              isDarkMode ? Colors.grey[800] : Colors.grey[200],
                         ),
                         _buildFixedExpenseItem(
                           title: '예정',
@@ -508,7 +521,9 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                       Text(
                         ' / 4',
                         style: TextStyle(
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey[600]),
+                            color: isDarkMode
+                                ? Colors.grey[400]
+                                : Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -525,24 +540,30 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                 TextButton.icon(
                   onPressed: () {},
                   icon: Icon(Icons.notifications_none,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600]),
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600]),
                   label: Text('소비알림',
-                    style: TextStyle(
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600])),
+                      style: TextStyle(
+                          color: isDarkMode
+                              ? Colors.grey[400]
+                              : Colors.grey[600])),
                   style: TextButton.styleFrom(
-                    foregroundColor: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    foregroundColor:
+                        isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   ),
                 ),
                 const SizedBox(width: 16),
                 TextButton.icon(
                   onPressed: () {},
                   icon: Icon(Icons.bar_chart,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600]),
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600]),
                   label: Text('우리마이데이터',
-                    style: TextStyle(
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600])),
+                      style: TextStyle(
+                          color: isDarkMode
+                              ? Colors.grey[400]
+                              : Colors.grey[600])),
                   style: TextButton.styleFrom(
-                    foregroundColor: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    foregroundColor:
+                        isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   ),
                 ),
               ],
@@ -567,7 +588,7 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!),
+              color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!),
         ),
       ),
       child: Row(
@@ -590,8 +611,8 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
               color: isDarkMode ? Colors.white : Colors.black87,
             ),
           ),
-          Icon(Icons.arrow_forward_ios, size: 16,
-            color: isDarkMode ? Colors.white : Colors.black87),
+          Icon(Icons.arrow_forward_ios,
+              size: 16, color: isDarkMode ? Colors.white : Colors.black87),
         ],
       ),
     );
@@ -646,8 +667,8 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                 color: isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 16,
-              color: isDarkMode ? Colors.white : Colors.black87),
+            Icon(Icons.arrow_forward_ios,
+                size: 16, color: isDarkMode ? Colors.white : Colors.black87),
           ],
         ),
       ],
@@ -658,12 +679,12 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
     final now = DateTime.now();
     final firstDay = DateTime(now.year, now.month - 3, 1);
     final lastDay = DateTime(now.year, now.month + 3, 0);
-    
+
     // 현재 달의 마지막 날짜 구하기
     final lastDayOfMonth = DateTime(now.year, now.month + 1, 0).day;
     // 마지막 날짜가 31일이면 405, 아니면 380
     final calendarHeight = lastDayOfMonth == 31 ? 405.0 : 360.0;
-    
+
     return Center(
       child: FractionallySizedBox(
         widthFactor: 0.9,
@@ -676,18 +697,14 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: isDarkMode 
-                  ? Colors.black26 
-                  : Colors.grey.withAlpha(20),
+                color: isDarkMode ? Colors.black26 : Colors.grey.withAlpha(20),
                 blurRadius: 10,
                 spreadRadius: 0,
                 offset: const Offset(0, 4),
               ),
             ],
             border: Border.all(
-              color: isDarkMode 
-                ? Colors.grey[800]! 
-                : Colors.grey.withAlpha(50),
+              color: isDarkMode ? Colors.grey[800]! : Colors.grey.withAlpha(50),
               width: 1,
             ),
           ),
@@ -709,20 +726,21 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
               leftChevronMargin: EdgeInsets.zero,
               rightChevronMargin: EdgeInsets.zero,
               headerMargin: EdgeInsets.zero,
-              headerPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+              headerPadding:
+                  const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
               leftChevronPadding: EdgeInsets.zero,
               rightChevronPadding: EdgeInsets.zero,
-              leftChevronIcon: Icon(Icons.arrow_back_ios, size: 14,
-                color: isDarkMode ? Colors.white : Colors.black87),
-              rightChevronIcon: Icon(Icons.arrow_forward_ios, size: 14,
-                color: isDarkMode ? Colors.white : Colors.black87),
+              leftChevronIcon: Icon(Icons.arrow_back_ios,
+                  size: 14, color: isDarkMode ? Colors.white : Colors.black87),
+              rightChevronIcon: Icon(Icons.arrow_forward_ios,
+                  size: 14, color: isDarkMode ? Colors.white : Colors.black87),
             ),
             daysOfWeekHeight: 20,
             rowHeight: 50,
             availableGestures: AvailableGestures.none,
             daysOfWeekStyle: DaysOfWeekStyle(
-              weekdayStyle: TextStyle(
-                color: isDarkMode ? Colors.white : Colors.black87),
+              weekdayStyle:
+                  TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
               weekendStyle: const TextStyle(color: Colors.red),
             ),
             locale: 'ko_KR',
@@ -736,8 +754,8 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
             },
             calendarStyle: CalendarStyle(
               outsideDaysVisible: false,
-              defaultTextStyle: TextStyle(
-                color: isDarkMode ? Colors.white : Colors.black87),
+              defaultTextStyle:
+                  TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
               weekendTextStyle: const TextStyle(color: Colors.red),
               holidayTextStyle: const TextStyle(color: Colors.blue),
               selectedDecoration: const BoxDecoration(
@@ -756,12 +774,15 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
             ),
             calendarBuilders: CalendarBuilders(
               markerBuilder: (context, date, events) {
-                if (_consumeData.containsKey(DateTime(date.year, date.month, date.day))) {
-                  final amount = _consumeData[DateTime(date.year, date.month, date.day)]!;
+                if (_consumeData
+                    .containsKey(DateTime(date.year, date.month, date.day))) {
+                  final amount =
+                      _consumeData[DateTime(date.year, date.month, date.day)]!;
                   return Positioned(
                     bottom: 5,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 2),
                       decoration: BoxDecoration(
                         color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
                         borderRadius: BorderRadius.circular(4),
@@ -770,7 +791,8 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                         _numberFormat.format(amount),
                         style: TextStyle(
                           fontSize: 10,
-                          color: isDarkMode ? Colors.grey[300] : Colors.grey[600],
+                          color:
+                              isDarkMode ? Colors.grey[300] : Colors.grey[600],
                         ),
                       ),
                     ),
@@ -810,9 +832,12 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                     OutlinedButton(
                       onPressed: () {},
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         side: BorderSide(
-                          color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                          color: isDarkMode
+                              ? Colors.grey[700]!
+                              : Colors.grey[300]!,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
@@ -821,7 +846,8 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
                       child: Text(
                         '더보기',
                         style: TextStyle(
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                          color:
+                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
                           fontSize: 14,
                         ),
                       ),
@@ -914,7 +940,8 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen> with SingleTicker
     );
   }
 
-  Widget _buildCategoryItem(String category, String amount, double progress, Color color, bool isDarkMode) {
+  Widget _buildCategoryItem(String category, String amount, double progress,
+      Color color, bool isDarkMode) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Column(
@@ -964,8 +991,7 @@ class PieChartPainter extends CustomPainter {
     final radius = min(size.width / 2, size.height / 2);
     final rect = Rect.fromCircle(center: center, radius: radius);
 
-    final paint = Paint()
-      ..style = PaintingStyle.fill;
+    final paint = Paint()..style = PaintingStyle.fill;
 
     // 외식 40%
     paint.color = Colors.blue;
@@ -991,8 +1017,7 @@ class PieChartPainter extends CustomPainter {
 class BarChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.fill;
+    final paint = Paint()..style = PaintingStyle.fill;
 
     final barWidth = size.width / 8;
     final spacing = barWidth / 2;
@@ -1020,4 +1045,4 @@ class BarChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-} 
+}

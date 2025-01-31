@@ -18,7 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$UserData {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String? get email => throw _privateConstructorUsedError;
+  String get email => throw _privateConstructorUsedError;
   String? get profileImage => throw _privateConstructorUsedError;
 
   /// Create a copy of UserData
@@ -33,7 +33,7 @@ abstract class $UserDataCopyWith<$Res> {
   factory $UserDataCopyWith(UserData value, $Res Function(UserData) then) =
       _$UserDataCopyWithImpl<$Res, UserData>;
   @useResult
-  $Res call({String id, String name, String? email, String? profileImage});
+  $Res call({String id, String name, String email, String? profileImage});
 }
 
 /// @nodoc
@@ -53,7 +53,7 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? email = freezed,
+    Object? email = null,
     Object? profileImage = freezed,
   }) {
     return _then(_value.copyWith(
@@ -65,10 +65,10 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      email: freezed == email
+      email: null == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       profileImage: freezed == profileImage
           ? _value.profileImage
           : profileImage // ignore: cast_nullable_to_non_nullable
@@ -85,7 +85,7 @@ abstract class _$$UserDataImplCopyWith<$Res>
       __$$UserDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String name, String? email, String? profileImage});
+  $Res call({String id, String name, String email, String? profileImage});
 }
 
 /// @nodoc
@@ -103,7 +103,7 @@ class __$$UserDataImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? email = freezed,
+    Object? email = null,
     Object? profileImage = freezed,
   }) {
     return _then(_$UserDataImpl(
@@ -115,10 +115,10 @@ class __$$UserDataImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      email: freezed == email
+      email: null == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       profileImage: freezed == profileImage
           ? _value.profileImage
           : profileImage // ignore: cast_nullable_to_non_nullable
@@ -131,14 +131,17 @@ class __$$UserDataImplCopyWithImpl<$Res>
 
 class _$UserDataImpl with DiagnosticableTreeMixin implements _UserData {
   const _$UserDataImpl(
-      {required this.id, required this.name, this.email, this.profileImage});
+      {required this.id,
+      required this.name,
+      required this.email,
+      this.profileImage});
 
   @override
   final String id;
   @override
   final String name;
   @override
-  final String? email;
+  final String email;
   @override
   final String? profileImage;
 
@@ -186,7 +189,7 @@ abstract class _UserData implements UserData {
   const factory _UserData(
       {required final String id,
       required final String name,
-      final String? email,
+      required final String email,
       final String? profileImage}) = _$UserDataImpl;
 
   @override
@@ -194,7 +197,7 @@ abstract class _UserData implements UserData {
   @override
   String get name;
   @override
-  String? get email;
+  String get email;
   @override
   String? get profileImage;
 
@@ -208,8 +211,8 @@ abstract class _UserData implements UserData {
 
 /// @nodoc
 mixin _$AuthState {
-  bool get isLoading => throw _privateConstructorUsedError;
   bool get isAuthenticated => throw _privateConstructorUsedError;
+  bool get isLoading => throw _privateConstructorUsedError;
   bool get isAmountVisible => throw _privateConstructorUsedError;
   UserData? get userData => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
@@ -227,8 +230,8 @@ abstract class $AuthStateCopyWith<$Res> {
       _$AuthStateCopyWithImpl<$Res, AuthState>;
   @useResult
   $Res call(
-      {bool isLoading,
-      bool isAuthenticated,
+      {bool isAuthenticated,
+      bool isLoading,
       bool isAmountVisible,
       UserData? userData,
       String? errorMessage});
@@ -251,20 +254,20 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isLoading = null,
     Object? isAuthenticated = null,
+    Object? isLoading = null,
     Object? isAmountVisible = null,
     Object? userData = freezed,
     Object? errorMessage = freezed,
   }) {
     return _then(_value.copyWith(
-      isLoading: null == isLoading
-          ? _value.isLoading
-          : isLoading // ignore: cast_nullable_to_non_nullable
-              as bool,
       isAuthenticated: null == isAuthenticated
           ? _value.isAuthenticated
           : isAuthenticated // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isLoading: null == isLoading
+          ? _value.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
       isAmountVisible: null == isAmountVisible
           ? _value.isAmountVisible
@@ -305,8 +308,8 @@ abstract class _$$AuthStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {bool isLoading,
-      bool isAuthenticated,
+      {bool isAuthenticated,
+      bool isLoading,
       bool isAmountVisible,
       UserData? userData,
       String? errorMessage});
@@ -328,20 +331,20 @@ class __$$AuthStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isLoading = null,
     Object? isAuthenticated = null,
+    Object? isLoading = null,
     Object? isAmountVisible = null,
     Object? userData = freezed,
     Object? errorMessage = freezed,
   }) {
     return _then(_$AuthStateImpl(
-      isLoading: null == isLoading
-          ? _value.isLoading
-          : isLoading // ignore: cast_nullable_to_non_nullable
-              as bool,
       isAuthenticated: null == isAuthenticated
           ? _value.isAuthenticated
           : isAuthenticated // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isLoading: null == isLoading
+          ? _value.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
       isAmountVisible: null == isAmountVisible
           ? _value.isAmountVisible
@@ -363,18 +366,18 @@ class __$$AuthStateImplCopyWithImpl<$Res>
 
 class _$AuthStateImpl with DiagnosticableTreeMixin implements _AuthState {
   const _$AuthStateImpl(
-      {this.isLoading = false,
-      this.isAuthenticated = false,
+      {this.isAuthenticated = false,
+      this.isLoading = false,
       this.isAmountVisible = true,
       this.userData,
       this.errorMessage});
 
   @override
   @JsonKey()
-  final bool isLoading;
+  final bool isAuthenticated;
   @override
   @JsonKey()
-  final bool isAuthenticated;
+  final bool isLoading;
   @override
   @JsonKey()
   final bool isAmountVisible;
@@ -385,7 +388,7 @@ class _$AuthStateImpl with DiagnosticableTreeMixin implements _AuthState {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'AuthState(isLoading: $isLoading, isAuthenticated: $isAuthenticated, isAmountVisible: $isAmountVisible, userData: $userData, errorMessage: $errorMessage)';
+    return 'AuthState(isAuthenticated: $isAuthenticated, isLoading: $isLoading, isAmountVisible: $isAmountVisible, userData: $userData, errorMessage: $errorMessage)';
   }
 
   @override
@@ -393,8 +396,8 @@ class _$AuthStateImpl with DiagnosticableTreeMixin implements _AuthState {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'AuthState'))
-      ..add(DiagnosticsProperty('isLoading', isLoading))
       ..add(DiagnosticsProperty('isAuthenticated', isAuthenticated))
+      ..add(DiagnosticsProperty('isLoading', isLoading))
       ..add(DiagnosticsProperty('isAmountVisible', isAmountVisible))
       ..add(DiagnosticsProperty('userData', userData))
       ..add(DiagnosticsProperty('errorMessage', errorMessage));
@@ -405,10 +408,10 @@ class _$AuthStateImpl with DiagnosticableTreeMixin implements _AuthState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AuthStateImpl &&
-            (identical(other.isLoading, isLoading) ||
-                other.isLoading == isLoading) &&
             (identical(other.isAuthenticated, isAuthenticated) ||
                 other.isAuthenticated == isAuthenticated) &&
+            (identical(other.isLoading, isLoading) ||
+                other.isLoading == isLoading) &&
             (identical(other.isAmountVisible, isAmountVisible) ||
                 other.isAmountVisible == isAmountVisible) &&
             (identical(other.userData, userData) ||
@@ -418,7 +421,7 @@ class _$AuthStateImpl with DiagnosticableTreeMixin implements _AuthState {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, isLoading, isAuthenticated,
+  int get hashCode => Object.hash(runtimeType, isAuthenticated, isLoading,
       isAmountVisible, userData, errorMessage);
 
   /// Create a copy of AuthState
@@ -432,16 +435,16 @@ class _$AuthStateImpl with DiagnosticableTreeMixin implements _AuthState {
 
 abstract class _AuthState implements AuthState {
   const factory _AuthState(
-      {final bool isLoading,
-      final bool isAuthenticated,
+      {final bool isAuthenticated,
+      final bool isLoading,
       final bool isAmountVisible,
       final UserData? userData,
       final String? errorMessage}) = _$AuthStateImpl;
 
   @override
-  bool get isLoading;
-  @override
   bool get isAuthenticated;
+  @override
+  bool get isLoading;
   @override
   bool get isAmountVisible;
   @override
