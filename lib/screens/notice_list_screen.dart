@@ -6,6 +6,7 @@ class NoticeListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final notices = [
       {
         'id': 1,
@@ -40,81 +41,67 @@ class NoticeListScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back,
+            color: isDarkMode ? Colors.white : Colors.black87),
           onPressed: () => context.go('/'),
         ),
-        title: const Text('공지사항'),
+        title: Text('공지사항',
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+        ),
       ),
       body: ListView.separated(
         itemCount: notices.length,
-        separatorBuilder: (context, index) => const Divider(height: 1),
+        separatorBuilder: (context, index) => Divider(
+          color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+        ),
         itemBuilder: (context, index) {
           final notice = notices[index];
-          return Container(
-            color: Colors.white,
-            child: ListTile(
-              tileColor: Colors.white,
-              contentPadding: const EdgeInsets.all(16),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_today,
-                          size: 14, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      Text(
-                        notice['date'] as String,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
+          return ListTile(
+            title: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    notice['title'] as String,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          notice['title'] as String,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                ),
+                if (notice['isNew'] as bool)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? Colors.blue[900] : Colors.blue[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'NEW',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDarkMode ? Colors.white : Colors.blue[900],
                       ),
-                      if (notice['isNew'] as bool)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                          ),
-                          child: const Text(
-                            'NEW',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
-                ],
-              ),
-              onTap: () {
-                context.push('/notice/${notice['id']}');
-              },
+              ],
             ),
+            subtitle: Text(
+              notice['date'] as String,
+              style: TextStyle(
+                fontSize: 14,
+                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              ),
+            ),
+            onTap: () => context.push('/notice/${notice['id']}'),
           );
         },
       ),

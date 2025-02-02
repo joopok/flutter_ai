@@ -7,6 +7,7 @@ import '../components/loading_overlay.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_colors.dart';
 import '../constants/app_constants.dart';
+import '../components/account_list_bottom_sheet.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key});
@@ -367,9 +368,11 @@ class _BalanceAmount extends StatelessWidget {
   }
 }
 
-class _AccountInfo extends StatelessWidget {
+class _AccountInfo extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authNotifierProvider);
+    
     return Row(
       children: [
         Text(
@@ -386,11 +389,23 @@ class _AccountInfo extends StatelessWidget {
             color: Colors.white.withAlpha(51),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: const Text(
-            '전체보기',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
+          child: GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) => AccountListBottomSheet(
+                  isAmountVisible: authState.isAmountVisible,
+                  onToggleAmountVisibility: () => ref.read(authNotifierProvider.notifier).toggleAmountVisibility(),
+                  onRefresh: () async => Future.value(),
+                ),
+              );
+            },
+            child: const Text(
+              '전체보기',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+              ),
             ),
           ),
         ),

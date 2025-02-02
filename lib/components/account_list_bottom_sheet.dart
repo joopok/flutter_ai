@@ -296,6 +296,8 @@ class _AccountListBottomSheetState extends ConsumerState<AccountListBottomSheet>
 
   void _showAccountDetail(
       BuildContext context, String title, String accountNumber, String amount) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -303,9 +305,9 @@ class _AccountListBottomSheetState extends ConsumerState<AccountListBottomSheet>
       builder: (BuildContext context) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.9,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            color: isDarkMode ? Colors.grey[900] : Colors.white,
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
             ),
@@ -317,7 +319,7 @@ class _AccountListBottomSheetState extends ConsumerState<AccountListBottomSheet>
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -328,19 +330,24 @@ class _AccountListBottomSheetState extends ConsumerState<AccountListBottomSheet>
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black87,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close),
+                      icon: Icon(Icons.close,
+                        color: isDarkMode ? Colors.white : Colors.black87),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
                 ),
               ),
-              const Divider(height: 1),
+              Divider(
+                height: 1,
+                color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+              ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -348,47 +355,54 @@ class _AccountListBottomSheetState extends ConsumerState<AccountListBottomSheet>
                   children: [
                     Text(
                       accountNumber,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey,
+                        color: isDarkMode ? Colors.grey[400] : Colors.grey,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       '${amount}원',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black87,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Divider(height: 1),
+              Divider(
+                height: 1,
+                color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+              ),
               Expanded(
                 child: ListView.separated(
                   itemCount: 10,
-                  separatorBuilder: (context, index) =>
-                      const Divider(height: 1),
+                  separatorBuilder: (context, index) => Divider(
+                    height: 1,
+                    color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                  ),
                   itemBuilder: (context, index) {
                     return ListTile(
                       title: Text(
                         '거래내역 ${index + 1}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
+                          color: isDarkMode ? Colors.white : Colors.black87,
                         ),
                       ),
                       subtitle: Text(
                         '${DateTime.now().subtract(Duration(days: index)).toString().split(' ')[0]}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey,
+                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
                         ),
                       ),
                       trailing: Text(
                         '-${(index + 1) * 10000}원',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.red,

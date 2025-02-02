@@ -139,7 +139,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          'SANG SANG Banking',
+                          'SANG SANG Bank',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
