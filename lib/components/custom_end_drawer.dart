@@ -204,46 +204,28 @@ class CustomEndDrawer extends ConsumerWidget {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.info_outline,
+              leading: const Icon(Icons.notifications),
+              title: const Text('공지사항'),
+              onTap: () => context.push('/notice'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('앱 소개'),
+              onTap: () => context.push('/app-introduction'),
+            ),
+            ListTile(
+              leading: Icon(Icons.logout,
                   color: isDarkMode ? Colors.white : Colors.black87),
-              title: Text('앱 정보',
+              title: Text('로그아웃',
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black87,
                   )),
-              onTap: () {
-                Navigator.pop(context);
+              onTap: () async {
+                await ref.read(authNotifierProvider.notifier).logout();
+                if (context.mounted) {
+                  context.go('/login');
+                }
               },
-            ),
-            const Divider(),
-            const Spacer(),
-            Container(
-              margin: const EdgeInsets.all(16),
-              child: ElevatedButton(
-                onPressed: () async {
-                  await ref.read(authNotifierProvider.notifier).logout();
-                  if (context.mounted) {
-                    context.go('/login');
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isDarkMode ? AppColors.darkSurface : Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(
-                      color: isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
-                    ),
-                  ),
-                ),
-                child: Text(
-                  '로그아웃',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: isDarkMode ? Colors.white : AppColors.darkText,
-                  ),
-                ),
-              ),
             ),
           ],
         ),

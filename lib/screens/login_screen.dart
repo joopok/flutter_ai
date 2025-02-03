@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_colors.dart';
 
@@ -129,17 +130,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.white.withAlpha(26),
-                            shape: BoxShape.circle,
                           ),
-                          child: const Icon(
-                            Icons.account_balance,
-                            size: 48,
-                            color: Colors.white,
+                          child: CachedNetworkImage(
+                            imageUrl: 'https://cdn-icons-png.flaticon.com/512/2830/2830284.png',
+                            height: 120,
+                            width: 120,
+                            fit: BoxFit.contain,
+                            placeholder: (context, url) => const SizedBox(
+                              height: 60,
+                              width: 60,
+                              child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => const Icon(
+                              Icons.error,
+                              size: 60,
+                              color: Colors.red,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          'SANG SANG Bank',
+                          '상상은행',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -148,7 +161,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '생생은행과 함께하는 금융생활',
+                          '상상은행과 함께하는 스마트한 금융생활',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.white.withAlpha(204),
@@ -333,18 +346,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildTextButton('아이디 찾기', isDarkMode),
+                      _buildTextButton('아이디 찾기', isDarkMode, onPressed: () {
+                        context.push('/find-id');
+                      }),
                       _buildDivider(isDarkMode),
-                      _buildTextButton('비밀번호 찾기', isDarkMode),
+                      _buildTextButton('비밀번호 찾기', isDarkMode, onPressed: () {
+                        context.push('/find-password'); 
+                      }),
                       _buildDivider(isDarkMode),
-                      _buildTextButton('회원가입', isDarkMode),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildTextButton('API 테스트', isDarkMode, onPressed: () {
-                        context.push('/api-test');
+                      _buildTextButton('회원가입', isDarkMode, onPressed: () {
+                        context.push('/signup');
                       }),
                     ],
                   ),

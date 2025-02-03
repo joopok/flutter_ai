@@ -21,10 +21,12 @@ import 'screens/workplace_screen.dart';
 import 'screens/esports_screen.dart';
 import 'screens/teen_screen.dart';
 import 'screens/benefit.dart';
-import 'package:flutter/services.dart';
 import 'screens/api_test_screen.dart';
-
-
+import 'package:flutter/services.dart';
+import 'screens/find_id_screen.dart';
+import 'screens/find_password_screen.dart';
+import 'screens/signup_screen.dart';
+import 'screens/app_introduction_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,24 +58,34 @@ final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: '/splash',
     routes: [
+      // 스플래시 화면
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
       ),
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const MyHomePage(),
-        redirect: (context, state) {
-          final isAuthenticated = ref.read(authNotifierProvider).isAuthenticated;
-          if (!isAuthenticated) {
-            return '/login';
-          }
-          return null;
-        },
-      ),
+      
+      // 비로그인 화면들
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/find-id',
+        builder: (context, state) => const FindIdScreen(),
+      ),
+      GoRoute(
+        path: '/find-password',
+        builder: (context, state) => const FindPasswordScreen(),
+      ),
+      GoRoute(
+        path: '/signup',
+        builder: (context, state) => const SignupScreen(),
+      ),
+      
+      // 로그인 필요 화면들
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const MyHomePage(),
       ),
       GoRoute(
         path: '/asset',
@@ -94,10 +106,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/consume/detail',
         builder: (context, state) => const ConsumeDetailScreen(),
-      ),
-      GoRoute(
-        path: '/favor',
-        builder: (context, state) => const FavorScreen(),
       ),
       GoRoute(
         path: '/notice',
@@ -124,30 +132,45 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const TeenScreen(),
       ),
       GoRoute(
-        path: '/api-test',
-        builder: (context, state) => const ApiTestScreen(),
-        redirect: (context, state) => null,
-      ),
-      GoRoute(
         path: '/benefit',
         builder: (context, state) => const BenefitScreen(),
-        redirect: (context, state) => null,
+      ),
+      GoRoute(
+        path: '/api-test',
+        builder: (context, state) => const ApiTestScreen(),
+      ),
+      GoRoute(
+        path: '/app-introduction',
+        builder: (context, state) => const AppIntroductionScreen(),
       ),
     ],
     redirect: (context, state) {
       final isAuthenticated = ref.read(authNotifierProvider).isAuthenticated;
       final isLoggingIn = state.matchedLocation == '/login';
-      final isSplash = state.matchedLocation == '/splash';
-      final isApiTest = state.matchedLocation == '/api-test';
+      
+      // 인증이 필요없는 화면들
+      final nonAuthPaths = [
+        '/login',
+        '/find-id',
+        '/find-password',
+        '/signup',
+        '/splash',
+        '/app-introduction',
+      ];
+      
+      // 현재 경로가 인증이 필요없는 경로인지 확인
+      final isNonAuthPath = nonAuthPaths.contains(state.matchedLocation);
 
-      if (isApiTest) return null;
+      // 인증이 필요없는 경로는 리다이렉트하지 않음
+      if (isNonAuthPath) return null;
 
-      if (isSplash) return null;
-
-      if (!isAuthenticated && !isLoggingIn) {
+      // 인증이 필요한 경로에 대한 처리
+      if (!isAuthenticated) {
+        // 로그인이 필요한 페이지 접근 시 로그인 페이지로 리다이렉트
         return '/login';
       }
 
+      // 이미 로그인된 상태에서 로그인 페이지 접근 시 홈으로 리다이렉트
       if (isAuthenticated && isLoggingIn) {
         return '/';
       }
