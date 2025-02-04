@@ -22,15 +22,32 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen>
   late TabController _tabController;
   bool _showReconnectDialog = true;
   DateTime _selectedDate = DateTime.now();
+  bool _showExpenseDetails = false;  // 지출내역 표시 여부
   final NumberFormat _numberFormat = NumberFormat("#,###");
   final CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
+  bool _showAllCategories = false; // 모든 카테고리 표시 여부
 
   // 소비 데이터를 저장할 Map (날짜별 소비금액)
   final Map<DateTime, int> _consumeData = {
     DateTime(2024, 1, 15): 30000, // 3만원
+    DateTime(2024, 1, 19): 50000, // 5만원
     DateTime(2024, 1, 23): 696974, // 696,974원
+    DateTime(2024, 1, 26): 300000, // 30만원
     DateTime(2024, 1, 28): 1540000, // 154만원
+  };
+
+  // 지출내역 데이터
+  final Map<DateTime, List<Map<String, dynamic>>> _expenseDetails = {
+    DateTime(2024, 1, 19): [
+      {'time': '09:30', 'title': '스타벅스', 'amount': 5000},
+      {'time': '12:30', 'title': '점심식사', 'amount': 15000},
+      {'time': '19:00', 'title': '마트 장보기', 'amount': 30000},
+    ],
+    DateTime(2024, 1, 26): [
+      {'time': '11:00', 'title': '주유소', 'amount': 50000},
+      {'time': '14:00', 'title': '백화점', 'amount': 250000},
+    ],
   };
 
   @override
@@ -223,7 +240,11 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen>
 
             // 1월 소비 금액
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.only(
+                top: _showReconnectDialog ? 0 : 20,
+                left: 20,
+                right: 20,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -744,14 +765,7 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen>
               weekendStyle: const TextStyle(color: Colors.red),
             ),
             locale: 'ko_KR',
-            onDaySelected: (selectedDay, focusedDay) {
-              if (!isSameDay(_selectedDate, selectedDay)) {
-                setState(() {
-                  _selectedDate = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-              }
-            },
+            onDaySelected: onDaySelected,
             calendarStyle: CalendarStyle(
               outsideDaysVisible: false,
               defaultTextStyle:
@@ -807,6 +821,93 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen>
     );
   }
 
+  void onDaySelected(selectedDay, focusedDay) {
+    if (!isSameDay(_selectedDate, selectedDay)) {
+      setState(() {
+        _selectedDate = selectedDay;
+        _focusedDay = focusedDay;
+        _showExpenseDetails = true;  // 날짜 선택 시 지출내역 표시
+      });
+    }
+  }
+
+  Widget _buildExpenseDetails(bool isDarkMode) {
+    if (!_showExpenseDetails) return const SizedBox.shrink();
+
+    final expenses = _expenseDetails[DateTime(
+      _selectedDate.year,
+      _selectedDate.month,
+      _selectedDate.day,
+    )];
+
+    if (expenses == null || expenses.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        child: Text(
+          '선택한 날짜의 지출내역이 없습니다.',
+          style: TextStyle(
+            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[900] : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${_selectedDate.month}월 ${_selectedDate.day}일 지출내역',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...expenses.map((expense) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Text(
+                  expense['time'],
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    expense['title'],
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ),
+                Text(
+                  '${_numberFormat.format(expense['amount'])}원',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          )).toList(),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAnalysisTab(bool isDarkMode) {
     return SingleChildScrollView(
       child: Column(
@@ -843,12 +944,19 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen>
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      child: Text(
-                        '더보기',
-                        style: TextStyle(
-                          color:
-                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                          fontSize: 14,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _showAllCategories = !_showAllCategories;
+                          });
+                        },
+                        child: Text(
+                          _showAllCategories ? '접기' : '더보기',
+                          style: TextStyle(
+                            color:
+                                isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                     ),
@@ -864,32 +972,64 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen>
                   isDarkMode,
                 ),
                 _buildCategoryItem(
-                  '쇼핑',
-                  '987,654원',
-                  0.6,
+                  '교육비', 
+                  '1,520,000원',
+                  0.7,
                   Colors.green,
                   isDarkMode,
                 ),
                 _buildCategoryItem(
-                  '교통',
-                  '567,890원',
-                  0.4,
-                  Colors.orange,
+                  '교양비',
+                  '980,000원',
+                  0.65,
+                  Colors.amber,
                   isDarkMode,
                 ),
                 _buildCategoryItem(
-                  '문화/여가',
-                  '345,678원',
-                  0.3,
-                  Colors.purple,
+                  '통신비',
+                  '850,000원',
+                  0.55,
+                  Colors.pink,
                   isDarkMode,
                 ),
                 _buildCategoryItem(
-                  '생활',
-                  '234,567원',
-                  0.2,
-                  Colors.red,
+                  '관리비',
+                  '720,000원',
+                  0.45,
+                  Colors.teal,
                   isDarkMode,
+                ),
+                AnimatedCrossFade(
+                  duration: const Duration(milliseconds: 300),
+                  firstChild: const SizedBox.shrink(),
+                  secondChild: Column(
+                    children: [
+                      _buildCategoryItem(
+                        '여행비',
+                        '1,000,000원',
+                        0.6,
+                        Colors.orange,
+                        isDarkMode,
+                      ),
+                      _buildCategoryItem(
+                        '주유비',
+                        '520,000원',
+                        0.4,
+                        Colors.purple,
+                        isDarkMode,
+                      ),
+                      _buildCategoryItem(
+                        '도서비',
+                        '320,000원',
+                        0.3,
+                        Colors.red,
+                        isDarkMode,
+                      ),
+                    ],
+                  ),
+                  crossFadeState: _showAllCategories 
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
                 ),
               ],
             ),

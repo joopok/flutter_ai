@@ -21,7 +21,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
+    Future(() {
+      _checkLoginStatus();
+    });
   }
 
   Future<void> _checkLoginStatus() async {

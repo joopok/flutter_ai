@@ -32,8 +32,7 @@ class CustomEndDrawer extends ConsumerWidget {
                 children: [
                   const CircleAvatar(
                     radius: 30,
-                    backgroundImage: NetworkImage(
-                        'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'),
+                    backgroundImage: AssetImage('assets/app_icon/app_icon.png'),
                   ),
                   const SizedBox(width: 16),
                   Column(

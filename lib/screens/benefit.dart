@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../components/custom_bottom_navigation_bar.dart';
+import '../components/custom_end_drawer.dart';
 
 class BenefitScreen extends StatefulWidget {
   const BenefitScreen({super.key});
@@ -33,6 +34,7 @@ class BenefitScreenState extends State<BenefitScreen> {
           ),
         ),
       ),
+      endDrawer: const CustomEndDrawer(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
