@@ -304,6 +304,7 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen>
 
             // 달력
             _buildCalendar(isDarkMode),
+            _buildExpenseDetails(isDarkMode),  // 지출내역 위젯 추가
 
             // 전체 소비내역 보기 버튼
             Container(

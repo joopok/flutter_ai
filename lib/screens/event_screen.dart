@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../components/custom_end_drawer.dart';
 
 class EventScreen extends StatefulWidget {
   const EventScreen({super.key});
@@ -81,6 +82,7 @@ class _EventScreenState extends State<EventScreen> {
           ),
         ),
       ),
+      endDrawer: const CustomEndDrawer(),
       body: Column(
         children: [
           Expanded(

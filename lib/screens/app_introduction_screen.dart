@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../components/custom_end_drawer.dart';
 
 class AppIntroductionScreen extends StatelessWidget {
   const AppIntroductionScreen({super.key});
@@ -21,6 +22,7 @@ class AppIntroductionScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('앱 소개'),
       ),
+      endDrawer: const CustomEndDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
