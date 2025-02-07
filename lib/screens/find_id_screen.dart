@@ -16,8 +16,8 @@ class FindIdScreen extends StatelessWidget {
           children: [
             const Text('이메일을 입력하세요:'),
             const SizedBox(height: 8),
-            TextField(
-              decoration: const InputDecoration(
+            const TextField(
+              decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: '이메일',
                 hintText: 'example@domain.com',

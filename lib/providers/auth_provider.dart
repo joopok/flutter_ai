@@ -127,7 +127,6 @@ class AuthNotifier extends Notifier<AuthState> {
     state = state.copyWith(isAmountVisible: !state.isAmountVisible);
   }
 
-  // 임시 헬퍼 메서드들 (실제 구현 필요)
   Future<bool> _checkStoredToken() async {
     // TODO: 실제 토큰 확인 로직 구현
     return false;
@@ -149,6 +148,20 @@ class AuthNotifier extends Notifier<AuthState> {
       email: 'test@example.com',
       profileImage: 'https://via.placeholder.com/150',
     );
+  }
+
+  Future<void> setLoggedIn(String token, String username) async {
+    state = state.copyWith(
+      isAuthenticated: true,
+      userData: UserData(
+        id: username,
+        name: username,
+        email: '$username@example.com',
+        profileImage: 'https://ui-avatars.com/api/?name=$username&background=random',
+      ),
+      isLoading: false,
+    );
+    // TODO: 토큰 저장 로직 구현
   }
 }
 

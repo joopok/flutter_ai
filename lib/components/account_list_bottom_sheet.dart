@@ -393,8 +393,7 @@ class _AccountListBottomSheetState extends ConsumerState<AccountListBottomSheet>
                           color: isDarkMode ? Colors.white : Colors.black87,
                         ),
                       ),
-                      subtitle: Text(
-                        '${DateTime.now().subtract(Duration(days: index)).toString().split(' ')[0]}',
+                      subtitle: Text('${DateTime.now().subtract(Duration(days: index)).toString().split(' ')[0]}',
                         style: TextStyle(
                           fontSize: 14,
                           color: isDarkMode ? Colors.grey[400] : Colors.grey,
@@ -402,7 +401,7 @@ class _AccountListBottomSheetState extends ConsumerState<AccountListBottomSheet>
                       ),
                       trailing: Text(
                         '-${(index + 1) * 10000}원',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.red,

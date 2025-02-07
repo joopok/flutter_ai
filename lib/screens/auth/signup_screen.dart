@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
-import '../api/api_service.dart';
+import '../../api/api_config.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -13,7 +14,6 @@ class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _idController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   bool _isLoading = false;
 
@@ -23,18 +23,23 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ApiService.register(
-        username: _idController.text,
-        password: _passwordController.text,
-        name: _nameController.text,
-        email: _emailController.text,
+      final dio = Dio();
+      final response = await dio.post(
+        '${ApiConfig.baseUrl}/api /auth/register',
+        data: {
+          'username': _idController.text,
+          'password': _passwordController.text,
+          'email': _emailController.text,
+        },
       );
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('회원가입이 완료되었습니다.')),
-        );
-        context.go('/login');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('회원가입이 완료되었습니다.')),
+          );
+          context.go('/login');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -93,20 +98,6 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               const SizedBox(height: 16),
               TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: '성명',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '성명을 입력해주세요';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
@@ -148,7 +139,6 @@ class _SignupScreenState extends State<SignupScreen> {
   void dispose() {
     _idController.dispose();
     _passwordController.dispose();
-    _nameController.dispose();
     _emailController.dispose();
     super.dispose();
   }

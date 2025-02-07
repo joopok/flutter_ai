@@ -52,7 +52,7 @@ class TeenScreen extends StatelessWidget {
                   Text(
                     '상상은행과 함께 성장하는 청소년 금융생활',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withAlpha(204),
                       fontSize: 16,
                     ),
                   ),
@@ -84,7 +84,7 @@ class TeenScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withAlpha(26),
             spreadRadius: 1,
             blurRadius: 6,
             offset: const Offset(0, 2),

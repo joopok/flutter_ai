@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_colors.dart';
+import '../api/api_service.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -33,27 +34,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await ref.read(authNotifierProvider.notifier).login(
-              _idController.text,
-              _passwordController.text,
-            );
+        final response = await ApiService.login(
+          username: _idController.text,
+          password: _passwordController.text,
+        );
+        
+        // 로그인 성공 시 상태 업데이트
+        await ref.read(authNotifierProvider.notifier).setLoggedIn(
+          response['accessToken'] ?? '',
+          response['username'] ?? _idController.text,
+        );
 
-        final authState = ref.read(authNotifierProvider);
-        if (authState.errorMessage != null) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(authState.errorMessage!),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
+        if (mounted) {
+          context.go('/');
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('로그인 중 오류가 발생했습니다: $e'),
+              content: Text(e.toString().replaceAll('Exception: ', '')),
               backgroundColor: Colors.red,
             ),
           );

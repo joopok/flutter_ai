@@ -16,11 +16,11 @@ class FindPasswordScreen extends StatelessWidget {
           children: [
             const Text('아이디를 입력하세요:'),
             const SizedBox(height: 8),
-            TextField(
+            const TextField(
               autofocus: true,
               textInputAction: TextInputAction.next,
               textCapitalization: TextCapitalization.none,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: '아이디',
               ),

@@ -12,6 +12,8 @@ class CustomEndDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final themeState = ref.watch(themeNotifierProvider);
+    final authState = ref.watch(authNotifierProvider);
+    final userData = authState.userData;
 
     return Drawer(
       backgroundColor: isDarkMode ? AppColors.darkBackground : Colors.white,
@@ -30,9 +32,12 @@ class CustomEndDrawer extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 30,
-                    backgroundImage: AssetImage('assets/app_icon/app_icon.png'),
+                    backgroundImage: NetworkImage(
+                      userData?.profileImage ?? 
+                      'https://ui-avatars.com/api/?name=Guest&background=random',
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Column(
@@ -40,7 +45,7 @@ class CustomEndDrawer extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '도승현님',
+                        '${userData?.name ?? 'Guest'}님',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -49,7 +54,7 @@ class CustomEndDrawer extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'test@example.com',
+                        userData?.email ?? '',
                         style: TextStyle(
                           fontSize: 14,
                           color: isDarkMode ? Colors.grey[300] : Colors.grey,

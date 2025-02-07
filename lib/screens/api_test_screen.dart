@@ -19,8 +19,8 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
     const encoder = JsonEncoder.withIndent('  ');
     try {
       return encoder.convert(json)
-          .replaceAll('{', '{\n')
-          .replaceAll('}', '\n}')
+          .replaceAll('{', '{')
+          .replaceAll('}', '}')
           .replaceAll('": ', '": ');  // JSON 키-값 구분을 더 명확하게
     } catch (e) {
       return json.toString();
@@ -73,16 +73,14 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
 
   Future<void> _testTest() async {
     final testData = {
-      'id' : '1',
-      'email': 'test@example.com',
-      'name': 'John Doe',
-      'message': 'Test message',
+      'username': 'testuser2',
+      'password': 'testuser123',
     };
 
     try {
       final apiService = ref.read(apiServiceProvider);
       setState(() {
-        _result = '요청 URL: ${ApiConfig.baseUrl}${ApiConfig.test}\n'
+        _result = '요청 URL: ${ApiConfig.baseUrl}${ApiConfig.login}\n'
             '요청 메서드: POST\n'
             '요청 데이터:\n${_prettyJson(testData)}\n\n'
             '응답 대기 중...';
@@ -90,21 +88,22 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
 
       final response = await apiService.testWithHttp(
         id: testData['id']!,
-        email: testData['email']!,
+        username: testData['username']!,
         name: testData['name']!,
         message: testData['message'],
       );
 
       setState(() {
-        _result = '요청 URL: ${ApiConfig.baseUrl}${ApiConfig.test}\n'
+        _result = '요청 URL: ${ApiConfig.baseUrl}${ApiConfig.login}\n'
             '요청 메서드: POST\n'
-            '요청 데이터:\n${_prettyJson(testData)}\n\n'
+            '요청 데이터:\n${_prettyJson(testData)}'
             '응답:\n${_prettyJson({
               'success': response.success,
               'data': response.data,
               'message': response.message,
               'errors': response.errors,
-            })}';
+            }
+            )}';
       });
     } catch (e) {
       setState(() {
@@ -120,25 +119,25 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
 
   Future<void> _testLogin() async {
     final loginData = {
-      'email': 'test@example.com',
-      'password': 'password123',
+      'username': 'testuser2',
+      'password': 'testuser123',
     };
 
     try {
       final apiService = ref.read(apiServiceProvider);
       setState(() {
-        _result = '요청: POST /auth/login\n'
+        _result = '요청: POST /api/auth/login\n'
             '요청 데이터:\n${_prettyJson(loginData)}\n\n'
             '응답 대기 중...';
       });
 
       final response = await apiService.loginWithDio(
-        email: loginData['email']!,
+        username: loginData['username']!,
         password: loginData['password']!,
       );
 
       setState(() {
-        _result = '요청: POST /auth/login\n'
+        _result = '요청: POST /api/auth/login\n'
             '요청 데이터:\n${_prettyJson(loginData)}\n\n'
             '응답:\n${_prettyJson({
           'success': response.success,
@@ -149,7 +148,7 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
       });
     } catch (e) {
       setState(() {
-        _result = '요청: POST /auth/login\n'
+        _result = '요청: POST /api/auth/login\n'
             '요청 데이터:\n${_prettyJson(loginData)}\n\n'
             '에러 발생:\n${_prettyJson({
           'error': e.toString(),
@@ -185,7 +184,7 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
             ),
             ElevatedButton(
               onPressed: _testTest,
-              child: const Text('TEst 테스트'),
+              child: const Text('Test 테스트'),
             ),
             const SizedBox(height: 16),
             const Text('결과:', style: TextStyle(fontWeight: FontWeight.bold)),

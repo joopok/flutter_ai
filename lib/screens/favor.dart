@@ -306,7 +306,7 @@ class _FavorScreenState extends ConsumerState<FavorScreen> with SingleTickerProv
                             Text(
                               '2024.01.28 ~ 2024.02.28',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withAlpha(204),
                                 fontSize: 14,
                               ),
                             ),
@@ -317,7 +317,7 @@ class _FavorScreenState extends ConsumerState<FavorScreen> with SingleTickerProv
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withAlpha(51),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -648,7 +648,7 @@ class _FavorScreenState extends ConsumerState<FavorScreen> with SingleTickerProv
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
+            color: Colors.grey.withAlpha(26),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
