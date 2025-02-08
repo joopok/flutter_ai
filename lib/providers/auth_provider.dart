@@ -82,21 +82,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
         profileImage: result['profileImage'],
       );
       
-      final userData = UserData(
-        id: user.id.toString(),
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        updatedAt: DateTime.now().toIso8601String(),
-        profileImage: user.profileImage,
-      );
-      
       state = state.copyWith(
         isLoading: false,
         isAuthenticated: true,
         user: user,
-        userData: userData,
+        userData: UserData(
+          id: user.id.toString(),
+          name: user.name,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          updatedAt: DateTime.now().toIso8601String(),
+          profileImage: user.profileImage,
+        ),
       );
     } catch (e) {
       state = state.copyWith(
@@ -148,23 +146,13 @@ class Auth extends _$Auth {
       );
       
       final user = User(
-        id: 1, // API 응답에 맞게 수정
+        id: 1,
         email: result['email'] ?? '',
         name: result['name'] ?? '',
         username: result['username'] ?? '',
         role: result['role'] ?? 'user',
         updatedAt: DateTime.now().toIso8601String(),
         profileImage: result['profileImage'],
-      );
-      
-      final userData = UserData(
-        id: user.id.toString(),
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        updatedAt: DateTime.now().toIso8601String(),
-        profileImage: user.profileImage,
       );
       
       state = AsyncValue.data(user);
