@@ -130,6 +130,9 @@ class ApiService {
 
     final responseData = json.decode(response.body);
     _logApiCall('POST', ApiConfig.login, response: responseData);
+    
+    // responseData 출력
+    print('로그인 응답 데이터: $responseData');
 
     if (response.statusCode == 200) {
       return {

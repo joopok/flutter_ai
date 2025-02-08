@@ -8,7 +8,6 @@ import '../providers/auth_provider.dart';
 import '../theme/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../components/account_list_bottom_sheet.dart';
-import '../providers/auth_provider.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key});
@@ -152,7 +151,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     );
   }
 }
-
 class _AppBarTitle extends StatelessWidget {
   const _AppBarTitle({
     required this.userData,
@@ -173,13 +171,26 @@ class _AppBarTitle extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        Text(
-          '안녕하세요, ${userData?.name ?? '게스트'}님',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: isDarkMode ? Colors.white : AppColors.darkText,
-          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '안녕하세요,',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isDarkMode ? Colors.white : AppColors.darkText,
+              ),
+            ),
+            Text(
+              '${userData?.name ?? '게스트'}님',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: isDarkMode ? Colors.white : AppColors.darkText,
+              ),
+            ),
+          ],
         ),
       ],
     );

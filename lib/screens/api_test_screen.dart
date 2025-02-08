@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../api/api_service.dart';
-import '../api/api_config.dart';
-
+import '../utils/format_utils.dart';
 class ApiTestScreen extends ConsumerStatefulWidget {
   const ApiTestScreen({super.key});
 
@@ -14,18 +12,7 @@ class ApiTestScreen extends ConsumerStatefulWidget {
 class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
   String _result = '';
 
-  // JSON을 보기 좋게 포맷팅하는 함수
-  String _prettyJson(Map<String, dynamic> json) {
-    const encoder = JsonEncoder.withIndent('  ');
-    try {
-      return encoder.convert(json)
-          .replaceAll('{', '{')
-          .replaceAll('}', '}')
-          .replaceAll('": ', '": ');  // JSON 키-값 구분을 더 명확하게
-    } catch (e) {
-      return json.toString();
-    }
-  }
+
 
   Future<void> _testDioGet() async {
     try {
@@ -33,7 +20,7 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
       final response = await apiService.getProductsWithDio();
       setState(() {
         _result = '요청: GET /products\n\n'
-            '응답:\n${_prettyJson({
+            '응답:\n${prettyJson({
           'success': response.success,
           'data': response.data,
           'message': response.message,
@@ -42,7 +29,7 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
       });
     } catch (e) {
       setState(() {
-        _result = '에러 발생:\n${_prettyJson({
+        _result = '에러 발생:\n${prettyJson({
           'error': e.toString(),
         })}';
       });
@@ -55,7 +42,7 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
       final response = await apiService.getProductsWithHttp();
       setState(() {
         _result = '요청: GET /products\n\n'
-            '응답:\n${_prettyJson({
+            '응답:\n${prettyJson({
           'success': response.success,
           'data': response.data,
           'message': response.message,
@@ -64,7 +51,7 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
       });
     } catch (e) {
       setState(() {
-        _result = '에러 발생:\n${_prettyJson({
+        _result = '에러 발생:\n${prettyJson({
           'error': e.toString(),
         })}';
       });
@@ -81,7 +68,7 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
       final apiService = ref.read(apiServiceProvider);
       setState(() {
         _result = '요청: POST /api/auth/login\n'
-            '요청 데이터:\n${_prettyJson(loginData)}\n\n'
+            '요청 데이터:\n${prettyJson(loginData)}\n\n'
             '응답 대기 중...';
       });
 
@@ -92,8 +79,8 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
 
       setState(() {
         _result = '요청: POST /api/auth/login\n'
-            '요청 데이터:\n${_prettyJson(loginData)}\n\n'
-            '응답:\n${_prettyJson({
+            '요청 데이터:\n${prettyJson(loginData)}\n\n'
+            '응답:\n${prettyJson({
           'success': response.success,
           'data': response.data,
           'message': response.message,
@@ -103,8 +90,8 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
     } catch (e) {
       setState(() {
         _result = '요청: POST /api/auth/login\n'
-            '요청 데이터:\n${_prettyJson(loginData)}\n\n'
-            '에러 발생:\n${_prettyJson({
+            '요청 데이터:\n${prettyJson(loginData)}\n\n'
+            '에러 발생:\n${prettyJson({
           'error': e.toString(),
         })}';
       });

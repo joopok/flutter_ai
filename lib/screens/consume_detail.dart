@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../components/custom_app_bar.dart';
 
 class ConsumeDetailScreen extends StatelessWidget {

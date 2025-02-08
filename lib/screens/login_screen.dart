@@ -7,6 +7,8 @@ import '../theme/app_colors.dart';
 import '../components/loading_overlay.dart';
 import '../api/api_config.dart';
 import 'package:dio/dio.dart';
+import '../utils/format_utils.dart';
+//import 'package:json_pretty/json_pretty.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -45,7 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       ref.read(loadingProvider.notifier).show(LoadingType.initializing);
-      
+
       final response = await _dio.post<Map<String, dynamic>>(
         ApiConfig.login,
         data: {
@@ -53,23 +55,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           'password': _passwordController.text,
         },
       );
-      
+      //debugPrint('로그인 응답 데이터: ${prettyJson(response.data ?? {})}');
       if (response.statusCode == 200 && response.data != null) {
-        final responseData = response.data!;
+        final responseData = response.data as Map<String, dynamic>;
+        debugPrint('로그인 응답 데이터====: ${prettyJson(responseData)}');
+        //debugPrint('로그인 응답 데이터====: ${prettyPrintJson(responseData.toString())}');
+
+        // data 내부의 데이터에 접근
+        final data = responseData['data'] as Map<String, dynamic>;
+        //debugPrint('1111로그인 응답 데이터====: ${data['name']?.toString()}');
+        //debugPrint('1111로그인 응답 데이터====: ${data['name']}');
         final userData = UserData(
-          id: responseData['id']?.toString() ?? '',
-          name: responseData['name']?.toString() ?? _idController.text,
-          username: responseData['username']?.toString() ?? _idController.text,
-          email: responseData['email']?.toString() ?? '',
+          id: data['id']?.toString() ?? '',
+          name: data['name']?.toString() ?? _idController.text,
+          username: data['username']?.toString() ?? _idController.text,
+          email: data['email']?.toString() ?? '',
           role: responseData['role']?.toString() ?? 'user',
-          updatedAt: responseData['updated_at']?.toString() ?? DateTime.now().toIso8601String(),
-          profileImage: responseData['profile_image']?.toString(),
+          updatedAt: data['updated_at']?.toString() ??
+              DateTime.now().toIso8601String(),
+          profileImage: data['profile_image']?.toString(),
         );
-        
+        debugPrint('로그인 응답 데이터: $userData');
+
         await ref.read(authNotifierProvider.notifier).setLoggedIn(
-          responseData['access_token']?.toString() ?? '',
-          userData,
-        );
+              data['access_token']?.toString() ?? '',
+              userData,
+            );
 
         if (mounted) {
           final authState = ref.read(authNotifierProvider);
@@ -185,7 +196,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             color: Colors.white.withAlpha(26),
                           ),
                           child: CachedNetworkImage(
-                            imageUrl: 'https://cdn-icons-png.flaticon.com/512/2830/2830284.png',
+                            imageUrl:
+                                'https://cdn-icons-png.flaticon.com/512/2830/2830284.png',
                             height: 120,
                             width: 120,
                             fit: BoxFit.contain,
@@ -404,7 +416,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       }),
                       _buildDivider(isDarkMode),
                       _buildTextButton('비밀번호 찾기', isDarkMode, onPressed: () {
-                        context.push('/find-password'); 
+                        context.push('/find-password');
                       }),
                       _buildDivider(isDarkMode),
                       _buildTextButton('회원가입', isDarkMode, onPressed: () {
@@ -421,7 +433,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildTextButton(String text, bool isDarkMode, {VoidCallback? onPressed}) {
+  Widget _buildTextButton(String text, bool isDarkMode,
+      {VoidCallback? onPressed}) {
     return TextButton(
       onPressed: onPressed ?? () {},
       style: TextButton.styleFrom(
