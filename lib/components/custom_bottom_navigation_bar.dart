@@ -22,28 +22,27 @@ class CustomBottomNavigationBar extends ConsumerWidget {
       unselectedItemColor: isDarkMode ? Colors.grey[400] : Colors.grey[600],
       currentIndex: currentIndex,
       onTap: (index) async {
-        ref.read(loadingProvider.notifier).show(LoadingType.navigating);
-        debugPrint('index: $index');
-        switch (index) {
-          case 0:
-            context.go('/product');
-            break;
-          case 1:
-            context.go('/asset');
-            break;
-          case 2:
-            context.go('/');
-            break;
-          case 3:
-            context.go('/consume');
-            break;
-          case 4:
-            context.go('/favor');
-            break;
-        }
-
-        await Future.delayed(const Duration(milliseconds: 500));
-        if (context.mounted) {
+        try {
+          ref.read(loadingProvider.notifier).show(LoadingType.navigating);
+          debugPrint('index: $index');
+          switch (index) {
+            case 0:
+              await context.pushNamed('/product');
+              break;
+            case 1:
+              await context.pushNamed('/asset');
+              break;
+            case 2:
+              await context.pushNamed('/');
+              break;
+            case 3:
+              await context.pushNamed('/consume');
+              break;
+            case 4:
+              await context.pushNamed('/favor');
+              break;
+          }
+        } finally {
           ref.read(loadingProvider.notifier).hide();
         }
       },

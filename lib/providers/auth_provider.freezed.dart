@@ -285,11 +285,12 @@ abstract class _UserData implements UserData {
 
 /// @nodoc
 mixin _$AuthState {
-  bool get isAuthenticated => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
+  bool get isAuthenticated => throw _privateConstructorUsedError;
+  User? get user => throw _privateConstructorUsedError;
+  String? get errorMessage => throw _privateConstructorUsedError;
   bool get isAmountVisible => throw _privateConstructorUsedError;
   UserData? get userData => throw _privateConstructorUsedError;
-  String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
@@ -304,12 +305,14 @@ abstract class $AuthStateCopyWith<$Res> {
       _$AuthStateCopyWithImpl<$Res, AuthState>;
   @useResult
   $Res call(
-      {bool isAuthenticated,
-      bool isLoading,
+      {bool isLoading,
+      bool isAuthenticated,
+      User? user,
+      String? errorMessage,
       bool isAmountVisible,
-      UserData? userData,
-      String? errorMessage});
+      UserData? userData});
 
+  $UserCopyWith<$Res>? get user;
   $UserDataCopyWith<$Res>? get userData;
 }
 
@@ -328,21 +331,30 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isAuthenticated = null,
     Object? isLoading = null,
+    Object? isAuthenticated = null,
+    Object? user = freezed,
+    Object? errorMessage = freezed,
     Object? isAmountVisible = null,
     Object? userData = freezed,
-    Object? errorMessage = freezed,
   }) {
     return _then(_value.copyWith(
-      isAuthenticated: null == isAuthenticated
-          ? _value.isAuthenticated
-          : isAuthenticated // ignore: cast_nullable_to_non_nullable
-              as bool,
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
+      isAuthenticated: null == isAuthenticated
+          ? _value.isAuthenticated
+          : isAuthenticated // ignore: cast_nullable_to_non_nullable
+              as bool,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
+      errorMessage: freezed == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
       isAmountVisible: null == isAmountVisible
           ? _value.isAmountVisible
           : isAmountVisible // ignore: cast_nullable_to_non_nullable
@@ -351,11 +363,21 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
           ? _value.userData
           : userData // ignore: cast_nullable_to_non_nullable
               as UserData?,
-      errorMessage: freezed == errorMessage
-          ? _value.errorMessage
-          : errorMessage // ignore: cast_nullable_to_non_nullable
-              as String?,
     ) as $Val);
+  }
+
+  /// Create a copy of AuthState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
   }
 
   /// Create a copy of AuthState
@@ -382,12 +404,15 @@ abstract class _$$AuthStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {bool isAuthenticated,
-      bool isLoading,
+      {bool isLoading,
+      bool isAuthenticated,
+      User? user,
+      String? errorMessage,
       bool isAmountVisible,
-      UserData? userData,
-      String? errorMessage});
+      UserData? userData});
 
+  @override
+  $UserCopyWith<$Res>? get user;
   @override
   $UserDataCopyWith<$Res>? get userData;
 }
@@ -405,21 +430,30 @@ class __$$AuthStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isAuthenticated = null,
     Object? isLoading = null,
+    Object? isAuthenticated = null,
+    Object? user = freezed,
+    Object? errorMessage = freezed,
     Object? isAmountVisible = null,
     Object? userData = freezed,
-    Object? errorMessage = freezed,
   }) {
     return _then(_$AuthStateImpl(
-      isAuthenticated: null == isAuthenticated
-          ? _value.isAuthenticated
-          : isAuthenticated // ignore: cast_nullable_to_non_nullable
-              as bool,
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
+      isAuthenticated: null == isAuthenticated
+          ? _value.isAuthenticated
+          : isAuthenticated // ignore: cast_nullable_to_non_nullable
+              as bool,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
+      errorMessage: freezed == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
       isAmountVisible: null == isAmountVisible
           ? _value.isAmountVisible
           : isAmountVisible // ignore: cast_nullable_to_non_nullable
@@ -428,10 +462,6 @@ class __$$AuthStateImplCopyWithImpl<$Res>
           ? _value.userData
           : userData // ignore: cast_nullable_to_non_nullable
               as UserData?,
-      errorMessage: freezed == errorMessage
-          ? _value.errorMessage
-          : errorMessage // ignore: cast_nullable_to_non_nullable
-              as String?,
     ));
   }
 }
@@ -440,29 +470,32 @@ class __$$AuthStateImplCopyWithImpl<$Res>
 
 class _$AuthStateImpl with DiagnosticableTreeMixin implements _AuthState {
   const _$AuthStateImpl(
-      {this.isAuthenticated = false,
-      this.isLoading = false,
+      {this.isLoading = false,
+      this.isAuthenticated = false,
+      this.user,
+      this.errorMessage,
       this.isAmountVisible = true,
-      this.userData,
-      this.errorMessage});
+      this.userData});
 
-  @override
-  @JsonKey()
-  final bool isAuthenticated;
   @override
   @JsonKey()
   final bool isLoading;
   @override
   @JsonKey()
+  final bool isAuthenticated;
+  @override
+  final User? user;
+  @override
+  final String? errorMessage;
+  @override
+  @JsonKey()
   final bool isAmountVisible;
   @override
   final UserData? userData;
-  @override
-  final String? errorMessage;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'AuthState(isAuthenticated: $isAuthenticated, isLoading: $isLoading, isAmountVisible: $isAmountVisible, userData: $userData, errorMessage: $errorMessage)';
+    return 'AuthState(isLoading: $isLoading, isAuthenticated: $isAuthenticated, user: $user, errorMessage: $errorMessage, isAmountVisible: $isAmountVisible, userData: $userData)';
   }
 
   @override
@@ -470,11 +503,12 @@ class _$AuthStateImpl with DiagnosticableTreeMixin implements _AuthState {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'AuthState'))
-      ..add(DiagnosticsProperty('isAuthenticated', isAuthenticated))
       ..add(DiagnosticsProperty('isLoading', isLoading))
+      ..add(DiagnosticsProperty('isAuthenticated', isAuthenticated))
+      ..add(DiagnosticsProperty('user', user))
+      ..add(DiagnosticsProperty('errorMessage', errorMessage))
       ..add(DiagnosticsProperty('isAmountVisible', isAmountVisible))
-      ..add(DiagnosticsProperty('userData', userData))
-      ..add(DiagnosticsProperty('errorMessage', errorMessage));
+      ..add(DiagnosticsProperty('userData', userData));
   }
 
   @override
@@ -482,21 +516,22 @@ class _$AuthStateImpl with DiagnosticableTreeMixin implements _AuthState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AuthStateImpl &&
-            (identical(other.isAuthenticated, isAuthenticated) ||
-                other.isAuthenticated == isAuthenticated) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
+            (identical(other.isAuthenticated, isAuthenticated) ||
+                other.isAuthenticated == isAuthenticated) &&
+            (identical(other.user, user) || other.user == user) &&
+            (identical(other.errorMessage, errorMessage) ||
+                other.errorMessage == errorMessage) &&
             (identical(other.isAmountVisible, isAmountVisible) ||
                 other.isAmountVisible == isAmountVisible) &&
             (identical(other.userData, userData) ||
-                other.userData == userData) &&
-            (identical(other.errorMessage, errorMessage) ||
-                other.errorMessage == errorMessage));
+                other.userData == userData));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, isAuthenticated, isLoading,
-      isAmountVisible, userData, errorMessage);
+  int get hashCode => Object.hash(runtimeType, isLoading, isAuthenticated, user,
+      errorMessage, isAmountVisible, userData);
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
@@ -509,22 +544,25 @@ class _$AuthStateImpl with DiagnosticableTreeMixin implements _AuthState {
 
 abstract class _AuthState implements AuthState {
   const factory _AuthState(
-      {final bool isAuthenticated,
-      final bool isLoading,
+      {final bool isLoading,
+      final bool isAuthenticated,
+      final User? user,
+      final String? errorMessage,
       final bool isAmountVisible,
-      final UserData? userData,
-      final String? errorMessage}) = _$AuthStateImpl;
+      final UserData? userData}) = _$AuthStateImpl;
 
+  @override
+  bool get isLoading;
   @override
   bool get isAuthenticated;
   @override
-  bool get isLoading;
+  User? get user;
+  @override
+  String? get errorMessage;
   @override
   bool get isAmountVisible;
   @override
   UserData? get userData;
-  @override
-  String? get errorMessage;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.

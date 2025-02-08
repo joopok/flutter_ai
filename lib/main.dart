@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import 'providers/auth_provider.dart';
 import 'providers/theme_provider.dart';
@@ -22,32 +21,16 @@ import 'screens/esports_screen.dart';
 import 'screens/teen_screen.dart';
 import 'screens/benefit.dart';
 import 'screens/api_test_screen.dart';
-import 'package:flutter/services.dart';
 import 'screens/find_id_screen.dart';
 import 'screens/find_password_screen.dart';
-import 'screens/auth/signup_screen.dart';
+import 'screens/signup_screen.dart';
 import 'screens/app_introduction_screen.dart';
 import 'config/theme.dart';
+import 'screens/error_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final sharedPreferences = await SharedPreferences.getInstance();
-  
-  // 앱 시작 시 인증 상태 초기화
-  final isAuthenticated = sharedPreferences.getBool('isAuthenticated') ?? false;
-  final userId = sharedPreferences.getString('userId');
-  final userName = sharedPreferences.getString('userName');
 
-  // 필수 인증 데이터가 하나라도 없으면 모든 데이터 초기화
-  if (!isAuthenticated || userId == null || userName == null) {
-    await sharedPreferences.clear();
-  }
-
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-  
   runApp(
     const ProviderScope(
       child: MyApp(),
@@ -64,7 +47,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
       ),
-      
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const MyHomePage(),
+      ),
       // 비로그인 화면들
       GoRoute(
         path: '/login',
@@ -82,7 +72,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/signup',
         builder: (context, state) => const SignupScreen(),
       ),
-      
+
       // 로그인 필요 화면들
       GoRoute(
         path: '/',
@@ -145,10 +135,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const AppIntroductionScreen(),
       ),
     ],
+    errorBuilder: (context, state) => const ErrorScreen(),
     redirect: (context, state) {
-      final isAuthenticated = ref.read(authNotifierProvider).isAuthenticated;
+      final isAuthenticated = ref.read(authStateProvider).isAuthenticated;
       final isLoggingIn = state.matchedLocation == '/login';
-      
+
       // 인증이 필요없는 화면들
       final nonAuthPaths = [
         '/login',
@@ -158,7 +149,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         '/splash',
         '/app-introduction',
       ];
-      
+
       // 현재 경로가 인증이 필요없는 경로인지 확인
       final isNonAuthPath = nonAuthPaths.contains(state.matchedLocation);
 
@@ -183,27 +174,14 @@ final routerProvider = Provider<GoRouter>((ref) {
   return router;
 });
 
-class MyApp extends ConsumerStatefulWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  ConsumerState<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends ConsumerState<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() async {
-      await ref.read(authNotifierProvider.notifier).checkLoginStatus();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final isDarkMode = ref.watch(themeNotifierProvider);
-    
+
     return MaterialApp.router(
       title: 'WON Banking',
       theme: AppTheme.lightTheme,

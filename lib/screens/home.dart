@@ -90,7 +90,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authStateProvider);
     final userData = authState.userData;
 
     return Scaffold(
@@ -353,7 +353,7 @@ class _BalanceHeader extends StatelessWidget {
               size: 20,
             ),
             onPressed: () => ref
-                .read(authNotifierProvider.notifier)
+                .read(authStateProvider.notifier)
                 .toggleAmountVisibility(),
           ),
         ),
@@ -383,7 +383,7 @@ class _BalanceAmount extends StatelessWidget {
 class _AccountInfo extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authStateProvider);
     
     return Row(
       children: [
@@ -407,7 +407,7 @@ class _AccountInfo extends ConsumerWidget {
                 context: context,
                 builder: (context) => AccountListBottomSheet(
                   isAmountVisible: authState.isAmountVisible,
-                  onToggleAmountVisibility: () => ref.read(authNotifierProvider.notifier).toggleAmountVisibility(),
+                  onToggleAmountVisibility: () => ref.read(authStateProvider.notifier).toggleAmountVisibility(),
                   onRefresh: () async => Future.value(),
                 ),
               );

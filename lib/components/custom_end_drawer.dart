@@ -13,7 +13,7 @@ class CustomEndDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final themeState = ref.watch(themeNotifierProvider);
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authStateProvider);
     final userData = authState.userData;
 
     return Drawer(
@@ -236,11 +236,11 @@ class CustomEndDrawer extends ConsumerWidget {
                   message: '정말 로그아웃 하시겠습니까?',
                 );
                 
-                if (confirmed == true) {
-                  if (!context.mounted) return;
-                  await ref.read(authNotifierProvider.notifier).logout();
-                  if (!context.mounted) return;
-                  context.go('/login');
+                if (confirmed == true && context.mounted) {
+                  ref.read(authStateProvider.notifier).logout();
+                  if (context.mounted) {
+                    context.go('/login');
+                  }
                 }
               },
             ),

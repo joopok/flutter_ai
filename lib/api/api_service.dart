@@ -115,35 +115,31 @@ class ApiService {
     required String username,
     required String password,
   }) async {
-    final requestData = {
-      'username': username,
-      'password': password,
-    };
-    
-    _logApiCall('POST', ApiConfig.login, request: requestData);
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.baseUrl}/api/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'username': username,
+          'password': password,
+        }),
+      );
 
-    final response = await http.post(
-      Uri.parse('${ApiConfig.baseUrl}/api/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(requestData),
-    );
-
-    final responseData = json.decode(response.body);
-    _logApiCall('POST', ApiConfig.login, response: responseData);
-    
-    // responseData 출력
-    print('로그인 응답 데이터: $responseData');
-
-    if (response.statusCode == 200) {
-      return {
-        'accessToken': responseData['accessToken']?.toString() ?? '',
-        'username': responseData['username']?.toString() ?? username,
-        'message': responseData['message']?.toString(),
-      };
-    } else {
-      final errorMessage = responseData['message'] ?? '로그인에 실패했습니다.';
-      _logApiCall('POST', ApiConfig.login, response: {'error': errorMessage});
-      throw Exception(errorMessage);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        return {
+          'accessToken': responseData['accessToken']?.toString() ?? '',
+          'username': responseData['username']?.toString() ?? username,
+          'email': responseData['email']?.toString() ?? '',
+          'name': responseData['name']?.toString() ?? '',
+          'role': responseData['role']?.toString() ?? 'user',
+          'message': responseData['message']?.toString(),
+        };
+      } else {
+        throw Exception('로그인에 실패했습니다.');
+      }
+    } catch (e) {
+      throw Exception('네트워크 오류: $e');
     }
   }
 }

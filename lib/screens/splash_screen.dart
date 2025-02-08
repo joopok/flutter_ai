@@ -4,33 +4,19 @@ import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_colors.dart';
 
-class SplashScreen extends ConsumerStatefulWidget {
+class SplashScreen extends ConsumerWidget {
   const SplashScreen({super.key});
 
-  @override
-  ConsumerState<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends ConsumerState<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    _initialize();
-  }
-
-  Future<void> _initialize() async {
-    // 스플래시 화면 표시 시간
+  Future<void> _initialize(BuildContext context, WidgetRef ref) async {
     await Future.delayed(const Duration(seconds: 2));
     
-    if (!mounted) return;
+    if (!context.mounted) return;
 
-    // 로그인 상태 확인
-    await ref.read(authNotifierProvider.notifier).checkLoginStatus();
+    await ref.read(authStateProvider.notifier).checkLoginStatus();
     
-    if (!mounted) return;
+    if (!context.mounted) return;
 
-    // 인증 상태에 따라 적절한 화면으로 이동
-    final isAuthenticated = ref.read(authNotifierProvider).isAuthenticated;
+    final isAuthenticated = ref.read(authStateProvider).isAuthenticated;
     if (isAuthenticated) {
       context.go('/');
     } else {
@@ -39,7 +25,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<AuthState>(
+      authStateProvider,
+      (_, __) async {
+        await _initialize(context, ref);
+      },
+    );
+    
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(

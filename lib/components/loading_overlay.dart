@@ -81,62 +81,64 @@ class LoadingOverlay extends ConsumerWidget {
     final loadingState = ref.watch(loadingProvider);
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Stack(
-      children: [
-        child,
-        if (loadingState.isLoading)
-          Material(
-            color: Colors.black.withAlpha(40),
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-                margin: const EdgeInsets.symmetric(horizontal: 48),
-                decoration: BoxDecoration(
-                  color: isDarkMode ? const Color(0xFF1C1C1E) : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(10),
-                      blurRadius: 20,
-                      spreadRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: LoadingIndicator(
-                        indicatorType: Indicator.ballPulse,
-                        colors: [
-                          isDarkMode ? const Color(0xFF4B7BFF) : const Color(0xFF2D5AF0),
-                          isDarkMode ? const Color(0xFF6C8FFF) : const Color(0xFF4169E1),
-                          isDarkMode ? const Color(0xFF89A9FF) : const Color(0xFF6384FF),
-                        ],
-                        strokeWidth: 2,
-                      ),
-                    ),
-                    if (loadingState.message != null) ...[
-                      const SizedBox(height: 16),
-                      Text(
-                        loadingState.message!,
-                        style: TextStyle(
-                          color: isDarkMode ? Colors.white : const Color(0xFF1A1F36),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: -0.5,
-                        ),
-                        textAlign: TextAlign.center,
+    return SafeArea(
+      child: Stack(
+        children: [
+          child,
+          if (loadingState.isLoading)
+            Material(
+              color: Colors.black.withAlpha(40),
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+                  margin: const EdgeInsets.symmetric(horizontal: 48),
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? const Color(0xFF1C1C1E) : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(10),
+                        blurRadius: 20,
+                        spreadRadius: 5,
                       ),
                     ],
-                  ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: LoadingIndicator(
+                          indicatorType: Indicator.ballPulse,
+                          colors: [
+                            isDarkMode ? const Color(0xFF4B7BFF) : const Color(0xFF2D5AF0),
+                            isDarkMode ? const Color(0xFF6C8FFF) : const Color(0xFF4169E1),
+                            isDarkMode ? const Color(0xFF89A9FF) : const Color(0xFF6384FF),
+                          ],
+                          strokeWidth: 2,
+                        ),
+                      ),
+                      if (loadingState.message != null) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          loadingState.message!,
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : const Color(0xFF1A1F36),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: -0.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 } 

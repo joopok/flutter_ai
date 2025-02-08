@@ -12,8 +12,8 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       name: json['name'] as String,
       username: json['username'] as String,
       role: json['role'] as String,
-      updatedAt: json['updatedAt'] as String,
-      profileImage: json['profileImage'] as String?,
+      updatedAt: json['updatedAt'] as String? ?? null,
+      profileImage: json['profileImage'] as String? ?? null,
     );
 
 Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>

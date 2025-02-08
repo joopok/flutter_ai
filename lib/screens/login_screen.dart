@@ -14,14 +14,15 @@ class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class LoginScreenState extends ConsumerState<LoginScreen> {
   final _idController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
+  
   final _dio = Dio(BaseOptions(
     baseUrl: ApiConfig.baseUrl,
     connectTimeout: ApiConfig.timeout,
@@ -33,15 +34,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void initState() {
     super.initState();
     Future(() {
-      _checkLoginStatus();
+      _checkLoginStatus(ref);
     });
   }
 
-  Future<void> _checkLoginStatus() async {
-    await ref.read(authNotifierProvider.notifier).checkLoginStatus();
-  }
-
-  Future<void> _handleLogin() async {
+  void _handleLogin(BuildContext context, WidgetRef ref) async {
     if (!_formKey.currentState!.validate()) return;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
@@ -77,13 +74,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         );
         debugPrint('로그인 응답 데이터: $userData');
 
-        await ref.read(authNotifierProvider.notifier).setLoggedIn(
+        await ref.read(authStateProvider.notifier).setLoggedIn(
               data['access_token']?.toString() ?? '',
               userData,
             );
 
-        if (mounted) {
-          final authState = ref.read(authNotifierProvider);
+        if (context.mounted) {
+          final authState = ref.read(authStateProvider);
           if (authState.isAuthenticated) {
             context.go('/');
           } else {
@@ -104,7 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         throw Exception('로그인 응답이 올바르지 않습니다.');
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -118,7 +115,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         );
       }
     } finally {
-      if (mounted) {
+      if (context.mounted) {
         ref.read(loadingProvider.notifier).hide();
       }
     }
@@ -134,10 +131,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final authState = ref.watch(authNotifierProvider);
 
     // 로딩 중일 때 로딩 인디케이터 표시
-    if (authState.isLoading) {
+    if (ref.watch(authStateProvider).isLoading) {
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
@@ -146,10 +142,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     // 이미 로그인된 상태라면 홈 화면으로 이동
-    if (authState.isAuthenticated) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/');
-      });
+    if (context.mounted) {
+      final authState = ref.read(authStateProvider);
+      if (authState.isAuthenticated) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go('/');
+        });
+      }
     }
 
     return Scaffold(
@@ -385,7 +384,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton(
-                          onPressed: authState.isLoading ? null : _handleLogin,
+                          onPressed: ref.watch(authStateProvider).isLoading ? null : () => _handleLogin(context, ref),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: isDarkMode
                                 ? AppColors.primary
@@ -454,5 +453,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _checkLoginStatus(WidgetRef ref) async {
+    await ref.read(authStateProvider.notifier).checkLoginStatus();
   }
 }

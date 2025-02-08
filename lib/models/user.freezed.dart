@@ -25,7 +25,7 @@ mixin _$User {
   String get name => throw _privateConstructorUsedError;
   String get username => throw _privateConstructorUsedError;
   String get role => throw _privateConstructorUsedError;
-  String get updatedAt => throw _privateConstructorUsedError;
+  String? get updatedAt => throw _privateConstructorUsedError;
   String? get profileImage => throw _privateConstructorUsedError;
 
   /// Serializes this User to a JSON map.
@@ -48,7 +48,7 @@ abstract class $UserCopyWith<$Res> {
       String name,
       String username,
       String role,
-      String updatedAt,
+      String? updatedAt,
       String? profileImage});
 }
 
@@ -72,7 +72,7 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? name = null,
     Object? username = null,
     Object? role = null,
-    Object? updatedAt = null,
+    Object? updatedAt = freezed,
     Object? profileImage = freezed,
   }) {
     return _then(_value.copyWith(
@@ -96,10 +96,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
               as String,
-      updatedAt: null == updatedAt
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       profileImage: freezed == profileImage
           ? _value.profileImage
           : profileImage // ignore: cast_nullable_to_non_nullable
@@ -121,7 +121,7 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       String name,
       String username,
       String role,
-      String updatedAt,
+      String? updatedAt,
       String? profileImage});
 }
 
@@ -142,7 +142,7 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? name = null,
     Object? username = null,
     Object? role = null,
-    Object? updatedAt = null,
+    Object? updatedAt = freezed,
     Object? profileImage = freezed,
   }) {
     return _then(_$UserImpl(
@@ -166,10 +166,10 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
               as String,
-      updatedAt: null == updatedAt
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       profileImage: freezed == profileImage
           ? _value.profileImage
           : profileImage // ignore: cast_nullable_to_non_nullable
@@ -181,14 +181,14 @@ class __$$UserImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$UserImpl implements _User {
-  const _$UserImpl(
+  _$UserImpl(
       {required this.id,
       required this.email,
       required this.name,
       required this.username,
       required this.role,
-      required this.updatedAt,
-      this.profileImage});
+      this.updatedAt = null,
+      this.profileImage = null});
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
@@ -204,8 +204,10 @@ class _$UserImpl implements _User {
   @override
   final String role;
   @override
-  final String updatedAt;
+  @JsonKey()
+  final String? updatedAt;
   @override
+  @JsonKey()
   final String? profileImage;
 
   @override
@@ -252,13 +254,13 @@ class _$UserImpl implements _User {
 }
 
 abstract class _User implements User {
-  const factory _User(
+  factory _User(
       {required final int id,
       required final String email,
       required final String name,
       required final String username,
       required final String role,
-      required final String updatedAt,
+      final String? updatedAt,
       final String? profileImage}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
@@ -274,7 +276,7 @@ abstract class _User implements User {
   @override
   String get role;
   @override
-  String get updatedAt;
+  String? get updatedAt;
   @override
   String? get profileImage;
 
