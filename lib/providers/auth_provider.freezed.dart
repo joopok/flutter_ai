@@ -18,7 +18,10 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$UserData {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
+  String get username => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
+  String get role => throw _privateConstructorUsedError;
+  String get updatedAt => throw _privateConstructorUsedError;
   String? get profileImage => throw _privateConstructorUsedError;
 
   /// Create a copy of UserData
@@ -33,7 +36,14 @@ abstract class $UserDataCopyWith<$Res> {
   factory $UserDataCopyWith(UserData value, $Res Function(UserData) then) =
       _$UserDataCopyWithImpl<$Res, UserData>;
   @useResult
-  $Res call({String id, String name, String email, String? profileImage});
+  $Res call(
+      {String id,
+      String name,
+      String username,
+      String email,
+      String role,
+      String updatedAt,
+      String? profileImage});
 }
 
 /// @nodoc
@@ -53,7 +63,10 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
   $Res call({
     Object? id = null,
     Object? name = null,
+    Object? username = null,
     Object? email = null,
+    Object? role = null,
+    Object? updatedAt = null,
     Object? profileImage = freezed,
   }) {
     return _then(_value.copyWith(
@@ -65,9 +78,21 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String,
       email: null == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
+              as String,
+      role: null == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
               as String,
       profileImage: freezed == profileImage
           ? _value.profileImage
@@ -85,7 +110,14 @@ abstract class _$$UserDataImplCopyWith<$Res>
       __$$UserDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String name, String email, String? profileImage});
+  $Res call(
+      {String id,
+      String name,
+      String username,
+      String email,
+      String role,
+      String updatedAt,
+      String? profileImage});
 }
 
 /// @nodoc
@@ -103,7 +135,10 @@ class __$$UserDataImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? name = null,
+    Object? username = null,
     Object? email = null,
+    Object? role = null,
+    Object? updatedAt = null,
     Object? profileImage = freezed,
   }) {
     return _then(_$UserDataImpl(
@@ -115,9 +150,21 @@ class __$$UserDataImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String,
       email: null == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
+              as String,
+      role: null == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
               as String,
       profileImage: freezed == profileImage
           ? _value.profileImage
@@ -133,7 +180,10 @@ class _$UserDataImpl with DiagnosticableTreeMixin implements _UserData {
   const _$UserDataImpl(
       {required this.id,
       required this.name,
+      required this.username,
       required this.email,
+      required this.role,
+      required this.updatedAt,
       this.profileImage});
 
   @override
@@ -141,13 +191,19 @@ class _$UserDataImpl with DiagnosticableTreeMixin implements _UserData {
   @override
   final String name;
   @override
+  final String username;
+  @override
   final String email;
+  @override
+  final String role;
+  @override
+  final String updatedAt;
   @override
   final String? profileImage;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'UserData(id: $id, name: $name, email: $email, profileImage: $profileImage)';
+    return 'UserData(id: $id, name: $name, username: $username, email: $email, role: $role, updatedAt: $updatedAt, profileImage: $profileImage)';
   }
 
   @override
@@ -157,7 +213,10 @@ class _$UserDataImpl with DiagnosticableTreeMixin implements _UserData {
       ..add(DiagnosticsProperty('type', 'UserData'))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('username', username))
       ..add(DiagnosticsProperty('email', email))
+      ..add(DiagnosticsProperty('role', role))
+      ..add(DiagnosticsProperty('updatedAt', updatedAt))
       ..add(DiagnosticsProperty('profileImage', profileImage));
   }
 
@@ -168,13 +227,19 @@ class _$UserDataImpl with DiagnosticableTreeMixin implements _UserData {
             other is _$UserDataImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
+            (identical(other.username, username) ||
+                other.username == username) &&
             (identical(other.email, email) || other.email == email) &&
+            (identical(other.role, role) || other.role == role) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
             (identical(other.profileImage, profileImage) ||
                 other.profileImage == profileImage));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, email, profileImage);
+  int get hashCode => Object.hash(
+      runtimeType, id, name, username, email, role, updatedAt, profileImage);
 
   /// Create a copy of UserData
   /// with the given fields replaced by the non-null parameter values.
@@ -189,7 +254,10 @@ abstract class _UserData implements UserData {
   const factory _UserData(
       {required final String id,
       required final String name,
+      required final String username,
       required final String email,
+      required final String role,
+      required final String updatedAt,
       final String? profileImage}) = _$UserDataImpl;
 
   @override
@@ -197,7 +265,13 @@ abstract class _UserData implements UserData {
   @override
   String get name;
   @override
+  String get username;
+  @override
   String get email;
+  @override
+  String get role;
+  @override
+  String get updatedAt;
   @override
   String? get profileImage;
 

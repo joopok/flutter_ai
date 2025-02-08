@@ -4,7 +4,6 @@ import '../components/custom_bottom_navigation_bar.dart';
 import '../components/custom_end_drawer.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'dart:ui';
 import 'package:intl/date_symbol_data_local.dart';
 import 'dart:math'; // dart:math 패키지 추가
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -903,7 +902,7 @@ class _ConsumeScreenState extends ConsumerState<ConsumeScreen>
                 ),
               ],
             ),
-          )).toList(),
+          )),
         ],
       ),
     );

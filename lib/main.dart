@@ -25,8 +25,9 @@ import 'screens/api_test_screen.dart';
 import 'package:flutter/services.dart';
 import 'screens/find_id_screen.dart';
 import 'screens/find_password_screen.dart';
-import 'screens/signup_screen.dart';
+import 'screens/auth/signup_screen.dart';
 import 'screens/app_introduction_screen.dart';
+import 'config/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -205,7 +206,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     
     return MaterialApp.router(
       title: 'WON Banking',
-      theme: app_theme.AppTheme.lightTheme,
+      theme: AppTheme.lightTheme,
       darkTheme: app_theme.AppTheme.darkTheme,
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       routerConfig: router,

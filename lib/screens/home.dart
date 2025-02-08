@@ -8,6 +8,7 @@ import '../providers/auth_provider.dart';
 import '../theme/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../components/account_list_bottom_sheet.dart';
+import '../providers/auth_provider.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key});
@@ -173,7 +174,7 @@ class _AppBarTitle extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Text(
-          '${userData?.name ?? ""}님',
+          '안녕하세요, ${userData?.name ?? '게스트'}님',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,

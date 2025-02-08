@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_colors.dart';
-import '../api/api_service.dart';
+import '../components/loading_overlay.dart';
+import '../api/api_config.dart';
+import 'package:dio/dio.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -18,6 +20,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
+  final _dio = Dio(BaseOptions(
+    baseUrl: ApiConfig.baseUrl,
+    connectTimeout: ApiConfig.timeout,
+    receiveTimeout: ApiConfig.timeout,
+    headers: ApiConfig.headers,
+  ));
 
   @override
   void initState() {
@@ -32,31 +40,75 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        final response = await ApiService.login(
-          username: _idController.text,
-          password: _passwordController.text,
+    if (!_formKey.currentState!.validate()) return;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    try {
+      ref.read(loadingProvider.notifier).show(LoadingType.initializing);
+      
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiConfig.login,
+        data: {
+          'username': _idController.text,
+          'password': _passwordController.text,
+        },
+      );
+      
+      if (response.statusCode == 200 && response.data != null) {
+        final responseData = response.data!;
+        final userData = UserData(
+          id: responseData['id']?.toString() ?? '',
+          name: responseData['name']?.toString() ?? _idController.text,
+          username: responseData['username']?.toString() ?? _idController.text,
+          email: responseData['email']?.toString() ?? '',
+          role: responseData['role']?.toString() ?? 'user',
+          updatedAt: responseData['updated_at']?.toString() ?? DateTime.now().toIso8601String(),
+          profileImage: responseData['profile_image']?.toString(),
         );
         
-        // 로그인 성공 시 상태 업데이트
         await ref.read(authNotifierProvider.notifier).setLoggedIn(
-          response['accessToken'] ?? '',
-          response['username'] ?? _idController.text,
+          responseData['access_token']?.toString() ?? '',
+          userData,
         );
 
         if (mounted) {
-          context.go('/');
+          final authState = ref.read(authNotifierProvider);
+          if (authState.isAuthenticated) {
+            context.go('/');
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '로그인 실패: ${authState.errorMessage}',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.black : Colors.white,
+                  ),
+                ),
+                backgroundColor: isDarkMode ? Colors.white : Colors.red,
+              ),
+            );
+          }
         }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(e.toString().replaceAll('Exception: ', '')),
-              backgroundColor: Colors.red,
+      } else {
+        throw Exception('로그인 응답이 올바르지 않습니다.');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '로그인 오류: ${e is DioException ? e.message : e}',
+              style: TextStyle(
+                color: isDarkMode ? Colors.black : Colors.white,
+              ),
             ),
-          );
-        }
+            backgroundColor: isDarkMode ? Colors.white : Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        ref.read(loadingProvider.notifier).hide();
       }
     }
   }

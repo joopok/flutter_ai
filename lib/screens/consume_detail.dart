@@ -1,34 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../components/custom_app_bar.dart';
 
 class ConsumeDetailScreen extends StatelessWidget {
   const ConsumeDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return PopScope(
       canPop: true,
-      onPopInvoked: (bool didPop) {
-        if (didPop) {
-          context.go('/consume');
-        }
-      },
+      // onPopInvokedWithResult: (didPop) async {
+      //   context.go('/consume');
+      //   return true;
+      // },
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black87),
-            onPressed: () => context.go('/consume'),
-          ),
-          title: const Text(
-            '전체 소비내역',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
+        appBar: const CustomAppBar(
+          title: '전체 소비내역',
         ),
         body: ListView.builder(
           itemCount: 10, // 임시 데이터 개수
@@ -36,7 +25,12 @@ class ConsumeDetailScreen extends StatelessWidget {
             return ListTile(
               title: Text('소비내역 ${index + 1}'),
               subtitle: Text('2024.01.${index + 1}'),
-              trailing: Text('₩${(index + 1) * 10000}'),
+              trailing: Text(
+                '₩${(index + 1) * 10000}',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
+              ),
             );
           },
         ),

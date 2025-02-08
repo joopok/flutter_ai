@@ -1,8 +1,8 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../constants/app_constants.dart';
 
 part 'auth_provider.freezed.dart';
 part 'auth_provider.g.dart';
@@ -17,7 +17,10 @@ class UserData with _$UserData {
   const factory UserData({
     required String id,
     required String name,
+    required String username,
     required String email,
+    required String role,
+    required String updatedAt,
     String? profileImage,
   }) = _UserData;
 }
@@ -77,18 +80,17 @@ class AuthNotifier extends Notifier<AuthState> {
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
       
-      // TODO: 실제 로그인 API 호출 로직 구현
-      await Future.delayed(const Duration(seconds: 1)); // 임시 딜레이
-      
       if (userId == 'test' && password == 'test123') {
         final userData = const UserData(
-          id: 'test',
+          id: 'test', 
           name: '도승현',
+          username: 'test',
           email: 'test@example.com',
+          role: 'user',
+          updatedAt: '2024-01-01',
           profileImage: 'https://ui-avatars.com/api/?name=도승현&background=random',
         );
         
-        // TODO: 토큰 저장 로직 구현
         await _saveToken('dummy_token');
         
         state = state.copyWith(
@@ -141,27 +143,26 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   Future<UserData> _fetchUserData() async {
-    // TODO: 실제 사용자 데이터 조회 로직 구현
     return const UserData(
       id: 'test',
       name: '도승현',
+      username: 'test',
       email: 'test@example.com',
-      profileImage: 'https://via.placeholder.com/150',
+      role: 'user',
+      updatedAt: '2024-01-01',
+      profileImage: AppConstants.defaultProfileImage,
     );
   }
 
-  Future<void> setLoggedIn(String token, String username) async {
+  Future<void> setLoggedIn(String token, UserData userData) async {
     state = state.copyWith(
       isAuthenticated: true,
-      userData: UserData(
-        id: username,
-        name: username,
-        email: '$username@example.com',
-        profileImage: 'https://ui-avatars.com/api/?name=$username&background=random',
-      ),
+      userData: userData,
       isLoading: false,
     );
     // TODO: 토큰 저장 로직 구현
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
   }
 }
 

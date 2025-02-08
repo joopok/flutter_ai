@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'dio_client.dart';
 import 'http_client.dart';
 import '../models/api_response.dart';
@@ -10,6 +11,20 @@ final apiServiceProvider = Provider((ref) => ApiService(
       dioClient: ref.watch(dioClientProvider),
       httpClient: ref.watch(httpClientProvider),
     ));
+
+void _logApiCall(String method, String endpoint, {dynamic request, dynamic response}) {
+  if (kDebugMode) {
+    const encoder = JsonEncoder.withIndent('  ');
+    print('\n🌐 API 호출 [$method] $endpoint');
+    if (request != null) {
+      print('\n📤 요청:\n${encoder.convert(request)}');
+    }
+    if (response != null) {
+      print('\n📥 응답:\n${encoder.convert(response)}');
+    }
+    print('\n${'-' * 50}\n');
+  }
+}
 
 class ApiService {
   final DioClient dioClient;
@@ -47,25 +62,7 @@ class ApiService {
       },
     );
   }
-
-  // test.php API 호출
-  Future<ApiResponse<Map<String, dynamic>>> testWithHttp({
-    required String id,
-    required String username,
-    required String name,
-    String? message,
-  }) async {
-    return await httpClient.post(
-      ApiConfig.login,
-      body: {
-        'id': id,
-        'username': username,
-        'name': name,
-        if (message != null) 'message': message,
-      },
-    );
-  }
-
+ 
   // 제품 목록 조회 (Dio 사용)
   Future<ApiResponse<List<Map<String, dynamic>>>> getProductsWithDio() async {
     return await dioClient.get('/products');
@@ -87,21 +84,30 @@ class ApiService {
     required String name,
     required String email,
   }) async {
+    final requestData = {
+      'username': username,
+      'password': password,
+      'name': name,
+      'email': email,
+    };
+    
+    _logApiCall('POST', ApiConfig.register, request: requestData);
+
     final response = await http.post(
       Uri.parse('${ApiConfig.baseUrl}/api/auth/register'),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'username': username,
-        'password': password,
-        'name': name,
-        'email': email,
-      }),
+      body: json.encode(requestData),
     );
 
+    final responseData = json.decode(response.body);
+    _logApiCall('POST', ApiConfig.register, response: responseData);
+
     if (response.statusCode == 200 || response.statusCode == 201) {
-      return json.decode(response.body);
+      return responseData;
     } else {
-      throw Exception('회원가입 실패: ${response.body}');
+      final errorMessage = '회원가입 실패: ${response.body}';
+      _logApiCall('POST', ApiConfig.register, response: {'error': errorMessage});
+      throw Exception(errorMessage);
     }
   }
 
@@ -109,16 +115,21 @@ class ApiService {
     required String username,
     required String password,
   }) async {
+    final requestData = {
+      'username': username,
+      'password': password,
+    };
+    
+    _logApiCall('POST', ApiConfig.login, request: requestData);
+
     final response = await http.post(
       Uri.parse('${ApiConfig.baseUrl}/api/auth/login'),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'username': username,
-        'password': password,
-      }),
+      body: json.encode(requestData),
     );
 
     final responseData = json.decode(response.body);
+    _logApiCall('POST', ApiConfig.login, response: responseData);
 
     if (response.statusCode == 200) {
       return {
@@ -127,7 +138,9 @@ class ApiService {
         'message': responseData['message']?.toString(),
       };
     } else {
-      throw Exception(responseData['message'] ?? '로그인에 실패했습니다.');
+      final errorMessage = responseData['message'] ?? '로그인에 실패했습니다.';
+      _logApiCall('POST', ApiConfig.login, response: {'error': errorMessage});
+      throw Exception(errorMessage);
     }
   }
 }

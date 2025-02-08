@@ -362,7 +362,7 @@ class _AccountListBottomSheetState extends ConsumerState<AccountListBottomSheet>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${amount}원',
+                      '$amount원',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -393,7 +393,10 @@ class _AccountListBottomSheetState extends ConsumerState<AccountListBottomSheet>
                           color: isDarkMode ? Colors.white : Colors.black87,
                         ),
                       ),
-                      subtitle: Text('${DateTime.now().subtract(Duration(days: index)).toString().split(' ')[0]}',
+                      subtitle: Text(DateTime.now()
+                          .subtract(Duration(days: index))
+                          .toString()
+                          .split(' ')[0],
                         style: TextStyle(
                           fontSize: 14,
                           color: isDarkMode ? Colors.grey[400] : Colors.grey,

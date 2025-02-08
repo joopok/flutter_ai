@@ -70,53 +70,7 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
       });
     }
   }
-
-  Future<void> _testTest() async {
-    final testData = {
-      'username': 'testuser2',
-      'password': 'testuser123',
-    };
-
-    try {
-      final apiService = ref.read(apiServiceProvider);
-      setState(() {
-        _result = '요청 URL: ${ApiConfig.baseUrl}${ApiConfig.login}\n'
-            '요청 메서드: POST\n'
-            '요청 데이터:\n${_prettyJson(testData)}\n\n'
-            '응답 대기 중...';
-      });
-
-      final response = await apiService.testWithHttp(
-        id: testData['id']!,
-        username: testData['username']!,
-        name: testData['name']!,
-        message: testData['message'],
-      );
-
-      setState(() {
-        _result = '요청 URL: ${ApiConfig.baseUrl}${ApiConfig.login}\n'
-            '요청 메서드: POST\n'
-            '요청 데이터:\n${_prettyJson(testData)}'
-            '응답:\n${_prettyJson({
-              'success': response.success,
-              'data': response.data,
-              'message': response.message,
-              'errors': response.errors,
-            }
-            )}';
-      });
-    } catch (e) {
-      setState(() {
-        _result = '요청 URL: ${ApiConfig.baseUrl}${ApiConfig.test}\n'
-            '요청 메서드: POST\n'
-            '요청 데이터:\n${_prettyJson(testData)}\n\n'
-            '에러 발생:\n${_prettyJson({
-              'error': e.toString(),
-            })}';
-      });
-    }
-  }
-
+ 
   Future<void> _testLogin() async {
     final loginData = {
       'username': 'testuser2',
@@ -181,10 +135,6 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
             ElevatedButton(
               onPressed: _testLogin,
               child: const Text('로그인 테스트'),
-            ),
-            ElevatedButton(
-              onPressed: _testTest,
-              child: const Text('Test 테스트'),
             ),
             const SizedBox(height: 16),
             const Text('결과:', style: TextStyle(fontWeight: FontWeight.bold)),

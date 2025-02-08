@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/theme_provider.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_colors.dart';
+import 'custom_confirm_alert.dart';
 
 class CustomEndDrawer extends ConsumerWidget {
   const CustomEndDrawer({super.key});
@@ -40,27 +41,31 @@ class CustomEndDrawer extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${userData?.name ?? 'Guest'}님',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.white : Colors.black87,
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${userData?.name ?? 'Guest'}님 안녕하세요!',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.black87,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        userData?.email ?? '',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: isDarkMode ? Colors.grey[300] : Colors.grey,
-                        ),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        if (userData?.email != null)
+                          Text(
+                            userData!.email,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDarkMode ? Colors.grey[300] : Colors.grey,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -225,8 +230,16 @@ class CustomEndDrawer extends ConsumerWidget {
                     color: isDarkMode ? Colors.white : Colors.black87,
                   )),
               onTap: () async {
-                await ref.read(authNotifierProvider.notifier).logout();
-                if (context.mounted) {
+                final confirmed = await showCustomConfirmAlert(
+                  context: context,
+                  title: '로그아웃',
+                  message: '정말 로그아웃 하시겠습니까?',
+                );
+                
+                if (confirmed == true) {
+                  if (!context.mounted) return;
+                  await ref.read(authNotifierProvider.notifier).logout();
+                  if (!context.mounted) return;
                   context.go('/login');
                 }
               },
