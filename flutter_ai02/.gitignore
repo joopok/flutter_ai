@@ -1,0 +1,68 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Web related
+lib/generated_plugin_registrant.dart
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# 상위 디렉토리의 프로젝트들 제외
+../Best-Flutter-UI-Templates/
+../E-commerce-App-UI-Flutter/
+../E-commerce-Complete-Flutter-UI/
+../FLutter_SQLite_Authentication/
+../Flutter-Movie-App/
+../FlutterTravel/
+../Food-App-UI/
+../Free_Books_App-flutter/
+../blog_club/
+../books-app-client/
+../doctor_booking_app/
+../flutter-book-app/
+../flutter-book/
+../flutter_0202/
+../flutter_ai01/
+../flutter_book_list/
+../flutter_instagram_clone/
+../flutter_json_serializable/
+../flutter_ui_challenges/
+../golden-rabbit-flutter-novice/
+../health_care_app_flutter/
+../mytest01/
+../projects/
+../startup_app/
