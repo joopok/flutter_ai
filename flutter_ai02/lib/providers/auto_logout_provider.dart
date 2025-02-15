@@ -72,11 +72,8 @@ class AutoLogoutNotifier extends StateNotifier<AutoLogoutState> {
   }
 
   void _startInactivityTimer() {
-    // 로그인 상태일 때만 타이머 시작
-    if (ref.read(authStateProvider).isAuthenticated) {
-      _inactivityTimer?.cancel();
-      _inactivityTimer = Timer(const Duration(minutes: 1), _showWarning);
-    }
+    _inactivityTimer?.cancel();
+    _inactivityTimer = Timer(const Duration(minutes: 1), _showWarning);
   }
 
   void resetTimer() {
@@ -123,8 +120,7 @@ class AutoLogoutNotifier extends StateNotifier<AutoLogoutState> {
     } catch (e) {
       debugPrint('로그아웃 API 호출 실패: $e');
     } finally {
-      // API 성공 여부와 관계없이 로그아웃 처리
-      ref.read(routerProvider).go('/login');  // GoRouter.of() 대신 routerProvider 사용
+      ref.read(routerProvider).go('/login');
       ref.read(authStateProvider.notifier).logout();
       state = AutoLogoutState();
     }
@@ -134,7 +130,6 @@ class AutoLogoutNotifier extends StateNotifier<AutoLogoutState> {
     resetTimer();
   }
 
-  // 사용자 활동을 감지하는 메서드 추가
   void onUserActivity() {
     if (!state.isWarningVisible) {
       resetTimer();
