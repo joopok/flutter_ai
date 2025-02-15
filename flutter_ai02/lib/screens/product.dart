@@ -86,146 +86,138 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
           ),
         ),
         endDrawer: const CustomEndDrawer(),
-        body: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height - AppBar().preferredSize.height,
+        body: ListView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 6,
+                    child: _buildLargeMenuItem(
+                      context,
+                      title: '입출금/예금/적금',
+                      subtitle: '자산형성은 꾸준히 안전하게',
+                      isBlue: true,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 4,
+                    child: _buildLargeMenuItem(
+                      context,
+                      title: '청약',
+                      subtitle: '내집 마련의 시작',
+                    ),
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 6,
-                        child: _buildLargeMenuItem(
-                          context,
-                          title: '입출금/예금/적금',
-                          subtitle: '자산형성은 꾸준히 안전하게',
-                          isBlue: true,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 4,
-                        child: _buildLargeMenuItem(
-                          context,
-                          title: '청약',
-                          subtitle: '내집 마련의 시작',
-                        ),
-                      ),
-                    ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 3,
+                mainAxisSpacing: 12.0,
+                crossAxisSpacing: 12.0,
+                childAspectRatio: 0.85,
+                children: [
+                  _buildMenuItem(
+                    context,
+                    title: '대출',
+                    subtitle: '대출 금리와\n한도는?',
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 12.0,
-                    crossAxisSpacing: 12.0,
-                    childAspectRatio: 0.85,
-                    children: [
-                      _buildMenuItem(
-                        context,
-                        title: '대출',
-                        subtitle: '대출 금리와\n한도는?',
-                      ),
-                      _buildMenuItem(
-                        context,
-                        title: '펀드',
-                        subtitle: '더 높기 전에\n투자하자!',
-                      ),
-                      _buildMenuItem(
-                        context,
-                        title: '퇴직연금',
-                        subtitle: '개인형IRP로\n준비하자!',
-                      ),
-                      _buildMenuItem(
-                        context,
-                        title: '신탁',
-                        subtitle: 'ELT/ETF/채권형/\n상속·증여신탁상담',
-                      ),
-                      _buildMenuItem(
-                        context,
-                        title: 'ISA',
-                        subtitle: '개인종합\n자산관리',
-                      ),
-                      _buildMenuItem(
-                        context,
-                        title: '외환',
-                        subtitle: '최대 100%\n환율우대',
-                      ),
-                      _buildMenuItem(
-                        context,
-                        title: '개인사업자',
-                        subtitle: '사장님을\n위한 상품이?',
-                      ),
-                      _buildMenuItem(
-                        context,
-                        title: '보험',
-                        subtitle: '더 높기 전에\n준비하자!',
-                      ),
-                      _buildMenuItem(
-                        context,
-                        title: '골드/실버',
-                        subtitle: '재테크도\n실물로',
-                      ),
-                      _buildMenuItem(
-                        context,
-                        title: '카드',
-                        subtitle: '혜택으로 우대받고\n할인으로 알뜰하게',
-                      ),
-                      _buildMenuItem(
-                        context,
-                        title: '증권계좌',
-                        subtitle: '우리로 증권계좌\n연결까지',
-                      ),
-                      _buildMenuItem(
-                        context,
-                        title: '상상은행상품',
-                        subtitle: '상상은행그룹\n상품을 한 곳에서',
-                      ),
-                    ],
+                  _buildMenuItem(
+                    context,
+                    title: '펀드',
+                    subtitle: '더 높기 전에\n투자하자!',
                   ),
-                ),
-                const SizedBox(height: 32),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '우리 PICK!',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        '즐거운 여행을 준비하세요.',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        height: 240,
-                        child: _buildTravelCard(context),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
+                  _buildMenuItem(
+                    context,
+                    title: '퇴직연금',
+                    subtitle: '개인형IRP로\n준비하자!',
                   ),
-                ),
-                const SizedBox(height: 30),
-              ],
+                  _buildMenuItem(
+                    context,
+                    title: '신탁',
+                    subtitle: 'ELT/ETF/채권형/\n상속·증여신탁상담',
+                  ),
+                  _buildMenuItem(
+                    context,
+                    title: 'ISA',
+                    subtitle: '개인종합\n자산관리',
+                  ),
+                  _buildMenuItem(
+                    context,
+                    title: '외환',
+                    subtitle: '최대 100%\n환율우대',
+                  ),
+                  _buildMenuItem(
+                    context,
+                    title: '개인사업자',
+                    subtitle: '사장님을\n위한 상품이?',
+                  ),
+                  _buildMenuItem(
+                    context,
+                    title: '보험',
+                    subtitle: '더 높기 전에\n준비하자!',
+                  ),
+                  _buildMenuItem(
+                    context,
+                    title: '골드/실버',
+                    subtitle: '재테크도\n실물로',
+                  ),
+                  _buildMenuItem(
+                    context,
+                    title: '카드',
+                    subtitle: '혜택으로 우대받고\n할인으로 알뜰하게',
+                  ),
+                  _buildMenuItem(
+                    context,
+                    title: '증권계좌',
+                    subtitle: '우리로 증권계좌\n연결까지',
+                  ),
+                  _buildMenuItem(
+                    context,
+                    title: '상상은행상품',
+                    subtitle: '상상은행그룹\n상품을 한 곳에서',
+                  ),
+                ],
+              ),
             ),
-          ),
+            const SizedBox(height: 32),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '우리 PICK!',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    '즐거운 여행을 준비하세요.',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 240,
+                    child: _buildTravelCard(context),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
+          ],
         ),
         bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 0),
       ),

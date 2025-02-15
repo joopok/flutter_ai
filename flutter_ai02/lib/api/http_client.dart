@@ -4,11 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api_config.dart';
 import '../models/api_response.dart';
 import 'package:flutter/foundation.dart';
+import '../providers/auto_logout_provider.dart';
 
-final httpClientProvider = Provider((ref) => HttpClient());
+final httpClientProvider = Provider((ref) => HttpClient(ref));
 
 class HttpClient {
+  final Ref ref;
   final client = http.Client();
+
+  HttpClient(this.ref);
 
   Future<ApiResponse<T>> get<T>(
     String path, {
@@ -82,18 +86,26 @@ class HttpClient {
     Map<String, dynamic>? data,
   }) async {
     try {
+      // API 호출 시 자동 로그아웃 타이머 리셋
+      ref.read(autoLogoutProvider.notifier).resetTimer();
+      
       final uri = Uri.parse('${ApiConfig.baseUrl}$path');
+      final headers = {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json; charset=UTF-8',
+      };
+
       final response = await (method == 'GET' 
-        ? http.get(uri, headers: {'Content-Type': 'application/json'})
+        ? http.get(uri, headers: headers)
         : http.post(
             uri,
-            headers: {'Content-Type': 'application/json'},
-            body: json.encode(data),
+            headers: headers,
+            body: utf8.encode(json.encode(data)),
           ));
       
-      // 응답 로깅
-      debugPrint('Response status: ${response.statusCode}');
-      debugPrint('Response body: ${response.body}');
+      // UTF-8로 응답 디코딩
+      final responseBody = utf8.decode(response.bodyBytes);
+      debugPrint('Response body: $responseBody');
       
       if (response.statusCode != 200) {
         return ApiResponse<T>(
@@ -102,7 +114,7 @@ class HttpClient {
         );
       }
 
-      final responseData = json.decode(response.body) as Map<String, dynamic>? 
+      final responseData = json.decode(responseBody) as Map<String, dynamic>? 
           ?? {'data': null, 'message': '응답 데이터가 없습니다.'};
           
       return ApiResponse<T>(

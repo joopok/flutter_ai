@@ -31,6 +31,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'dart:developer' show log;
 import 'package:flutter/services.dart';
 import 'screens/notice_list.dart';  // NoticeListPage를 포함하는 파일
+import 'components/auto_logout_warning.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -105,11 +106,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/notice',
-        builder: (context, state) => const NoticeListScreen(),
+        builder: (context, state) => const NoticeListPage(),
       ),
       GoRoute(
         path: '/notice-list',
-        builder: (context, state) => const NoticeListScreen(),
+        builder: (context, state) => const NoticeListPage(),
       ),
       GoRoute(
         path: '/event',
@@ -191,24 +192,31 @@ class MyApp extends ConsumerWidget {
       builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(padding: EdgeInsets.zero),
-          child: LoadingOverlay(
-            child: Directionality(
-              textDirection: TextDirection.ltr,
-              child: Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: Column(
-                  children: [
-                    Container(
-                      height: MediaQuery.of(context).padding.top,
-                      color: Theme.of(context).appBarTheme.backgroundColor,
+          child: Stack(
+            children: [
+              LoadingOverlay(
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    child: Column(
+                      children: [
+                        Container(
+                          height: MediaQuery.of(context).padding.top,
+                          color: Theme.of(context).appBarTheme.backgroundColor,
+                        ),
+                        Expanded(
+                          child: child ?? const SizedBox(),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: child ?? const SizedBox(),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+              const AutoLogoutWarning(
+                child: SizedBox.shrink(),
+              ),
+            ],
           ),
         );
       },

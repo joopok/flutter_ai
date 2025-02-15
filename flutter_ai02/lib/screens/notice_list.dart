@@ -1,17 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../theme/app_colors.dart';
 import '../api/api_service.dart';
 import '../models/api_response.dart';
 import '../api/api_config.dart';
+import '../models/notice.dart';
 
-final noticeListProvider = FutureProvider.autoDispose<ApiResponse<List<Map<String, dynamic>>>>((ref) {
+final noticeListProvider = FutureProvider.autoDispose<ApiResponse<List<Notice>>>((ref) {
   final apiService = ref.watch(apiServiceProvider);
+
+  debugPrint('!!!!dataList ::::::');
   return apiService.request(
     method: 'POST',
     path: ApiConfig.noticeList,
-    fromJson: (json) => (json['data'] as List).cast<Map<String, dynamic>>(),
+    fromJson: (json) {
+      final dataList = json['data'] as List<dynamic>? ?? [];
+
+      debugPrint('!!!!dataList :::::: $dataList');
+
+      return dataList.map((item) {
+        final Map<String, dynamic> typedItem = Map<String, dynamic>.from(item as Map);
+         debugPrint('!!!!typedItem!!!!! :::::: $typedItem');
+        // id가 String으로 오는 경우 int로 변환
+        if (typedItem['noticeId'] is String) {
+          typedItem['noticeId'] = int.tryParse(typedItem['noticeId'] as String) ?? 0;
+        }
+        // createdAt이 String으로 오는 경우 DateTime으로 변환
+        if (typedItem['created_at'] is String) {
+          typedItem['created_at'] = DateTime.parse(typedItem['created_at'] as String);
+        }
+        return Notice.fromJson(typedItem);
+      }).toList();
+    },
   );
 });
 
@@ -22,11 +44,12 @@ class NoticeListPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final noticeListAsync = ref.watch(noticeListProvider);
+    final dateFormat = DateFormat('yyyy.MM.dd');
 
     return Scaffold(
       backgroundColor: isDarkMode ? AppColors.darkBackground : AppColors.lightBackground,
       appBar: AppBar(
-        title: const Text('공지사항111'),
+        title: const Text('공지사항'),
         backgroundColor: isDarkMode ? AppColors.darkSurface : Colors.white,
       ),
       body: noticeListAsync.when(
@@ -61,10 +84,10 @@ class NoticeListPage extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final notice = notices[index];
                 return _NoticeItem(
-                  title: notice['title'] as String,
-                  date: notice['created_at'] as String,
+                  title: notice.title,
+                  date: dateFormat.format(notice.createdAt),
                   isDarkMode: isDarkMode,
-                  onTap: () => context.push('/notice/${notice['id']}'),
+                  onTap: () => context.push('/notice/${notice.id}'),
                 );
               },
             ),
@@ -139,4 +162,4 @@ class _NoticeItem extends StatelessWidget {
       ),
     );
   }
-} 
+}

@@ -12,7 +12,7 @@ final noticeListProvider = FutureProvider.autoDispose<ApiResponse<List<Notice>>>
   final apiService = ref.watch(apiServiceProvider);
   return apiService.request(
     method: 'POST',
-    path: ApiConfig.notices,
+    path: ApiConfig.noticeList,
     fromJson: (json) => 
       (json['data'] as List).map((item) => Notice.fromJson(item)).toList(),
   );
@@ -98,7 +98,7 @@ class _NoticeListScreenState extends ConsumerState<NoticeListScreen> {
             color: isDarkMode ? Colors.white : Colors.black87),
           onPressed: () => context.go('/home'),
         ),
-        title: Text('공지사항ddd',
+        title: Text('공지사항',
           style: TextStyle(
             color: isDarkMode ? Colors.white : Colors.black87,
           ),

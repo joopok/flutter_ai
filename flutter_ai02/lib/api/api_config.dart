@@ -4,6 +4,7 @@ class ApiConfig {
 
   // API 엔드포인트
   static const String login = '/api/auth/login';
+  static const String logout = '/api/auth/logout';
   static const String register = '/api/auth/register';
   static const String users = '/users';
   static const String products = '/products';
@@ -12,12 +13,11 @@ class ApiConfig {
   static const String findById = '/api/findById';
   static const String update = '/api/update';
   static const String notice = '/api/notice';
-  static const String noticeList = '/api//notices';
+  static const String noticeList = '/api/notices/list';
   static const String noticeDetail = '/api/noticeDetail';
   static const String noticeInsert = '/api/noticeInsert';
   static const String noticeUpdate = '/api/noticeUpdate';
   static const String noticeDelete = '/api/noticeDelete';
-  static const String notices = '/api/notices';
   
   // 헤더
   static Map<String, String> get headers => {
