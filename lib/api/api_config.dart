@@ -18,10 +18,10 @@ class ApiConfig {
   static const String noticeInsert = '/api/noticeInsert';
   static const String noticeUpdate = '/api/noticeUpdate';
   static const String noticeDelete = '/api/noticeDelete';
-  
+
   // 헤더
   static Map<String, String> get headers => {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  };
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json; charset=UTF-8',
+      };
 }
