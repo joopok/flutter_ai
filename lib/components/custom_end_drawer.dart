@@ -79,6 +79,7 @@ class CustomEndDrawer extends ConsumerWidget {
                   )),
               onTap: () {
                 Navigator.pop(context);
+                context.go('/home');
               },
             ),
             ListTile(

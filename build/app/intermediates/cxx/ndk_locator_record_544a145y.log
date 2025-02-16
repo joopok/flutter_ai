@@ -1,0 +1,128 @@
+[
+  {
+    "level_": 0,
+    "message_": "android.ndkVersion from module build.gradle is [26.3.11579264]",
+    "file_": "",
+    "tag_": "",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 956687170
+  },
+  {
+    "level_": 0,
+    "message_": "android.ndkPath from module build.gradle is not set",
+    "file_": "",
+    "tag_": "",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 1687440006
+  },
+  {
+    "level_": 0,
+    "message_": "ndk.dir in local.properties is not set",
+    "file_": "",
+    "tag_": "",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1903066097
+  },
+  {
+    "level_": 0,
+    "message_": "Not considering ANDROID_NDK_HOME because support was removed after deprecation period.",
+    "file_": "",
+    "tag_": "",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -40252027
+  },
+  {
+    "level_": 0,
+    "message_": "sdkFolder is /Users/doseunghyeon/Library/Android/sdk",
+    "file_": "",
+    "tag_": "",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -547634222
+  },
+  {
+    "level_": 0,
+    "message_": "NDK side-by-side folder from sdkFolder /Users/doseunghyeon/Library/Android/sdk/ndk does not exist",
+    "file_": "",
+    "tag_": "",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 594764501
+  },
+  {
+    "level_": 0,
+    "message_": "Folder /Users/doseunghyeon/Library/Android/sdk/ndk/26.3.11579264 does not exist. Ignoring.",
+    "file_": "",
+    "tag_": "",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -609303623
+  },
+  {
+    "level_": 0,
+    "message_": "Folder /Users/doseunghyeon/Library/Android/sdk/ndk-bundle does not exist. Ignoring.",
+    "file_": "",
+    "tag_": "",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -761852421
+  },
+  {
+    "level_": 0,
+    "message_": "No NDK was found. Trying to download it now.",
+    "file_": "",
+    "tag_": "",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1277351375
+  }
+]

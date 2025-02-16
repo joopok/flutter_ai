@@ -20,11 +20,9 @@ Notice _$NoticeFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Notice {
-  @JsonKey(name: 'id')
   int get id => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
-  @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
   bool get isImportant => throw _privateConstructorUsedError;
 
@@ -43,10 +41,10 @@ abstract class $NoticeCopyWith<$Res> {
       _$NoticeCopyWithImpl<$Res, Notice>;
   @useResult
   $Res call(
-      {@JsonKey(name: 'id') int id,
+      {int id,
       String title,
       String content,
-      @JsonKey(name: 'created_at') DateTime createdAt,
+      DateTime createdAt,
       bool isImportant});
 }
 
@@ -104,10 +102,10 @@ abstract class _$$NoticeImplCopyWith<$Res> implements $NoticeCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'id') int id,
+      {int id,
       String title,
       String content,
-      @JsonKey(name: 'created_at') DateTime createdAt,
+      DateTime createdAt,
       bool isImportant});
 }
 
@@ -159,24 +157,22 @@ class __$$NoticeImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$NoticeImpl implements _Notice {
   const _$NoticeImpl(
-      {@JsonKey(name: 'id') required this.id,
+      {required this.id,
       required this.title,
       required this.content,
-      @JsonKey(name: 'created_at') required this.createdAt,
+      required this.createdAt,
       this.isImportant = false});
 
   factory _$NoticeImpl.fromJson(Map<String, dynamic> json) =>
       _$$NoticeImplFromJson(json);
 
   @override
-  @JsonKey(name: 'id')
   final int id;
   @override
   final String title;
   @override
   final String content;
   @override
-  @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
   @JsonKey()
@@ -224,23 +220,21 @@ class _$NoticeImpl implements _Notice {
 
 abstract class _Notice implements Notice {
   const factory _Notice(
-      {@JsonKey(name: 'id') required final int id,
+      {required final int id,
       required final String title,
       required final String content,
-      @JsonKey(name: 'created_at') required final DateTime createdAt,
+      required final DateTime createdAt,
       final bool isImportant}) = _$NoticeImpl;
 
   factory _Notice.fromJson(Map<String, dynamic> json) = _$NoticeImpl.fromJson;
 
   @override
-  @JsonKey(name: 'id')
   int get id;
   @override
   String get title;
   @override
   String get content;
   @override
-  @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
   bool get isImportant;

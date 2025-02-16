@@ -1,72 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../components/custom_end_drawer.dart';
+import '../utils/format_utils.dart';
+import '../api/api_service.dart';
+import '../api/api_config.dart';
+import '../models/api_response.dart';
 
-class EventScreen extends StatefulWidget {
+final eventListProvider = FutureProvider.autoDispose<ApiResponse<List<Map<String, dynamic>>>>((ref) {
+  final apiService = ref.watch(apiServiceProvider);
+
+  return apiService.request(
+    method: 'POST',
+    path: ApiConfig.eventList,
+    fromJson: (json) {
+      // 응답 데이터 로깅
+      debugPrint('이벤트 응답 데이터: $json');
+      
+      if (json== null) {
+         debugPrint('555555이벤트 응답 데이터: $json');
+        return [];
+      }
+
+      // data가 Map인 경우
+      if (json is Map) {
+        //debugPrint('1111이벤트 응답 데이터: $json');
+        final dataMap = json['data'] as Map<String, dynamic>;
+        return [dataMap]; // Map을 List로 변환하여 반환
+      }
+      
+      // data가 List인 경우
+      if (json is List) {
+        //debugPrint('2222이벤트 응답 데이터: $json');
+        return json.map((item) {
+          if (item is! Map) return <String, dynamic>{};
+          return Map<String, dynamic>.from(item);
+        }).toList();
+      }
+
+      // 예상치 못한 데이터 타입인 경우
+      debugPrint('예상치 못한 데이터 타입: ${json['data'].runtimeType}');
+      return [];
+    },
+  );
+});
+
+class EventScreen extends ConsumerWidget {
   const EventScreen({super.key});
 
   @override
-  State<EventScreen> createState() => _EventScreenState();
-}
-
-class _EventScreenState extends State<EventScreen> {
-  final List<Map<String, dynamic>> _allEvents = List.generate(
-    100,
-    (index) => {
-      'id': 'event_${index + 1}',
-      'title': '이벤트 ${index + 1}',
-      'description': '이벤트 ${index + 1}에 대한 상세 설명입니다. 많은 참여 부탁드립니다!',
-      'date': DateTime.now().subtract(Duration(days: index)),
-      'isActive': index < 50, // 첫 50개는 진행중, 나머지는 종료된 이벤트
-    },
-  );
-
-  final List<Map<String, dynamic>> _displayedEvents = [];
-  final ScrollController _scrollController = ScrollController();
-  bool _isLoading = false;
-  static const int _pageSize = 10;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadMoreEvents();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >= 
-        _scrollController.position.maxScrollExtent && !_isLoading) {
-      _loadMoreEvents();
-    }
-  }
-
-  Future<void> _loadMoreEvents() async {
-    if (_isLoading) return;
-    if (_displayedEvents.length >= _allEvents.length) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    // 실제 API 호출을 시뮬레이션하기 위한 지연
-    await Future.delayed(const Duration(seconds: 1)); // 로딩 시간을 좀 더 길게 설정
-
-    setState(() {
-      final nextItems = _allEvents.skip(_displayedEvents.length).take(_pageSize);
-      _displayedEvents.addAll(nextItems);
-      _isLoading = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final eventListAsync = ref.watch(eventListProvider);
+    final scrollController = ScrollController();
 
     return Scaffold(
       appBar: AppBar(
@@ -83,57 +69,60 @@ class _EventScreenState extends State<EventScreen> {
         ),
       ),
       endDrawer: const CustomEndDrawer(),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: _displayedEvents.length + 1,
-              itemBuilder: (context, index) {
-                if (index == _displayedEvents.length) {
-                  if (_isLoading) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Column(
-                        children: [
-                          const CircularProgressIndicator(),
-                          const SizedBox(height: 16),
-                          Text(
-                            '다음 페이지 로딩 중...',
-                            style: TextStyle(
-                              color: isDarkMode ? Colors.grey[300] : Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  if (_displayedEvents.length < _allEvents.length) {
-                    return Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        '아래로 스크롤하여 더 보기',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: isDarkMode ? Colors.grey[300] : Colors.grey[600],
-                        ),
-                      ),
-                    );
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      '모든 이벤트를 불러왔습니다.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: isDarkMode ? Colors.grey[300] : Colors.grey[600],
-                      ),
-                    ),
-                  );
-                }
+      body: eventListAsync.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        error: (error, stack) => Center(
+          child: SelectableText.rich(
+            TextSpan(
+              text: '에러가 발생했습니다: ',
+              children: [
+                TextSpan(
+                  text: error.toString(),
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ],
+            ),
+          ),
+        ),
+        data: (response) {
+          if (!response.success || response.data == null) {
+            return Center(
+              child: Text(
+                response.message ?? '데이터를 불러오는데 실패했습니다',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.grey[300] : Colors.grey[600],
+                ),
+              ),
+            );
+          }
 
-                final event = _displayedEvents[index];
+          final events = response.data!;
+          if (events.isEmpty) {
+            return Center(
+              child: Text(
+                '이벤트가 없습니다',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.grey[300] : Colors.grey[600],
+                ),
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () => ref.refresh(eventListProvider.future),
+            child: ListView.builder(
+              controller: scrollController,
+              padding: const EdgeInsets.all(16),
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                final event = events[index];
+                final isActive = event['isActive'] as bool? ?? false;
+                final title = event['title'] as String? ?? '';
+                final description = event['description'] as String? ?? '';
+                final date = event['date'] as String? ?? '';
+
                 return Card(
                   margin: const EdgeInsets.only(bottom: 16),
                   child: ListTile(
@@ -146,11 +135,11 @@ class _EventScreenState extends State<EventScreen> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: event['isActive'] ? Colors.green : Colors.grey,
+                            color: isActive ? Colors.green : Colors.grey,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            event['isActive'] ? '진행중' : '종료',
+                            isActive ? '진행중' : '종료',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
@@ -160,7 +149,7 @@ class _EventScreenState extends State<EventScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            event['title'],
+                            title,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -174,14 +163,14 @@ class _EventScreenState extends State<EventScreen> {
                       children: [
                         const SizedBox(height: 8),
                         Text(
-                          event['description'],
+                          description,
                           style: TextStyle(
                             color: isDarkMode ? Colors.grey[300] : Colors.grey[600],
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '시작일: ${_formatDate(event['date'])}',
+                          '시작일: ${dotFormatDate(DateTime.tryParse(date) ?? DateTime.now())}',
                           style: TextStyle(
                             color: isDarkMode ? Colors.grey[400] : Colors.grey[500],
                             fontSize: 12,
@@ -192,7 +181,7 @@ class _EventScreenState extends State<EventScreen> {
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('${event['title']} 상세 정보'),
+                          content: Text('$title 상세 정보'),
                         ),
                       );
                     },
@@ -200,13 +189,9 @@ class _EventScreenState extends State<EventScreen> {
                 );
               },
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
-
-  String _formatDate(DateTime date) {
-    return '${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
-  }
-} 
+}

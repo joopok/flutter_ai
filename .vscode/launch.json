@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "iOS",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "apple_ios_simulator"
+        },
+        {
+            "name": "Android",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "Pixel_8_Pro_API_35"
+        },
+        {
+            "name": "All Devices",
+            "request": "launch",
+            "type": "dart",
+            "args": ["-d", "all"]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Multi Device",
+            "configurations": ["iOS", "Android"]
+        }
+    ]
+} 

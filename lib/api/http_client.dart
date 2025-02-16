@@ -105,7 +105,7 @@ class HttpClient {
       
       // UTF-8로 응답 디코딩
       final responseBody = utf8.decode(response.bodyBytes);
-      debugPrint('Response body: $responseBody');
+      //debugPrint('Response body :::: $responseBody');
       
       if (response.statusCode != 200) {
         return ApiResponse<T>(
@@ -116,14 +116,14 @@ class HttpClient {
 
       final responseData = json.decode(responseBody) as Map<String, dynamic>? 
           ?? {'data': null, 'message': '응답 데이터가 없습니다.'};
-          
+      //debugPrint('Response responseData :::: $responseData');    
       return ApiResponse<T>(
         success: true,
         data: responseData['data'] as T?,
         message: responseData['message'] as String?,
       );
     } catch (e) {
-      debugPrint('Error in request: $e');
+      //debugPrint('Error in request: $e');
       return ApiResponse<T>(
         success: false,
         message: '오류가 발생했습니다: $e',
@@ -167,12 +167,7 @@ class HttpClient {
   }
 
   // 요청 로깅
-  void _logRequest(
-    String method,
-    Uri uri, {
-    Map<String, String>? headers,
-    dynamic body,
-  }) {
+  void _logRequest(String method, Uri uri, {Map<String, String>? headers, dynamic body, }) {
     final requestLog = {
       'method': method,
       'url': uri.toString(),

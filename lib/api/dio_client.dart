@@ -20,7 +20,6 @@ class DioClient {
     );
 
     _dio.interceptors.addAll([
-      _AuthInterceptor(),
       PrettyDioLogger(
         requestHeader: true,
         requestBody: true,
@@ -116,33 +115,5 @@ class DioClient {
         return '알 수 없는 오류가 발생했습니다.';
     }
   }
-
-  Future<ApiResponse<Map<String, dynamic>>> testPhpApi({
-    required String name,
-    required String email,
-  }) async {
-    return await post(
-      ApiConfig.test,
-      data: {
-        'name': name,
-        'email': email,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-}
-
-class _AuthInterceptor extends Interceptor {
-  @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    // TODO: SharedPreferences에서 토큰을 가져와서 헤더에 추가
-    // final token = await _getToken();
-    // if (token != null) {
-    //   options.headers['Authorization'] = 'Bearer $token';
-    // }
-    handler.next(options);
-  }
+ 
 }

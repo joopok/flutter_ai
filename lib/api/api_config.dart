@@ -13,6 +13,7 @@ class ApiConfig {
   static const String findById = '/api/findById';
   static const String update = '/api/update';
   static const String notice = '/api/notice';
+  static const String eventList = '/api/events/list';
   static const String noticeList = '/api/notices/list';
   static const String noticeDetail = '/api/noticeDetail';
   static const String noticeInsert = '/api/noticeInsert';

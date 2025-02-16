@@ -36,7 +36,6 @@ class AutoLogoutState {
 class AutoLogoutNotifier extends StateNotifier<AutoLogoutState> {
   final Ref ref;
   Timer? _inactivityTimer;
-  BuildContext? _context;
   
   AutoLogoutNotifier(this.ref) : super(AutoLogoutState()) {
     // 인증 상태 변경 감지
@@ -61,8 +60,6 @@ class AutoLogoutNotifier extends StateNotifier<AutoLogoutState> {
   }
 
   void setContext(BuildContext context) {
-    _context = context;
-    // context가 설정될 때 인증 상태 확인
     if (ref.read(authStateProvider).isAuthenticated) {
       resetTimer();
     } else {
@@ -73,7 +70,7 @@ class AutoLogoutNotifier extends StateNotifier<AutoLogoutState> {
 
   void _startInactivityTimer() {
     _inactivityTimer?.cancel();
-    _inactivityTimer = Timer(const Duration(minutes: 1), _showWarning);
+    _inactivityTimer = Timer(const Duration(minutes: 5), _showWarning);
   }
 
   void resetTimer() {
@@ -120,8 +117,8 @@ class AutoLogoutNotifier extends StateNotifier<AutoLogoutState> {
     } catch (e) {
       debugPrint('로그아웃 API 호출 실패: $e');
     } finally {
-      ref.read(routerProvider).go('/login');
       ref.read(authStateProvider.notifier).logout();
+      ref.read(routerProvider).go('/login');
       state = AutoLogoutState();
     }
   }

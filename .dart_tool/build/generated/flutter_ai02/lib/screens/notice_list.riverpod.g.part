@@ -1,0 +1,79 @@
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$pageHash() => r'b41cf6269565eb3729d8b38d5a26b162387c19dc';
+
+/// See also [Page].
+@ProviderFor(Page)
+final pageProvider = AutoDisposeNotifierProvider<Page, int>.internal(
+  Page.new,
+  name: r'pageProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$pageHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$Page = AutoDisposeNotifier<int>;
+String _$hasMoreHash() => r'a253b2b4143197e0c5e1647e3377e8e2eca80768';
+
+/// See also [HasMore].
+@ProviderFor(HasMore)
+final hasMoreProvider = AutoDisposeNotifierProvider<HasMore, bool>.internal(
+  HasMore.new,
+  name: r'hasMoreProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$hasMoreHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$HasMore = AutoDisposeNotifier<bool>;
+String _$isLoadingHash() => r'0b81f96f0f510f2699cd7784e779dbfc0d030173';
+
+/// See also [IsLoading].
+@ProviderFor(IsLoading)
+final isLoadingProvider = AutoDisposeNotifierProvider<IsLoading, bool>.internal(
+  IsLoading.new,
+  name: r'isLoadingProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$isLoadingHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$IsLoading = AutoDisposeNotifier<bool>;
+String _$showIndicatorHash() => r'f2ef654270fbd72e01da6ba0540ad6b250a56eff';
+
+/// See also [ShowIndicator].
+@ProviderFor(ShowIndicator)
+final showIndicatorProvider =
+    AutoDisposeNotifierProvider<ShowIndicator, bool>.internal(
+  ShowIndicator.new,
+  name: r'showIndicatorProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$showIndicatorHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$ShowIndicator = AutoDisposeNotifier<bool>;
+String _$noticeListHash() => r'acff2250679805fcf1329a5aca10c40ec4e2b8f7';
+
+/// See also [NoticeList].
+@ProviderFor(NoticeList)
+final noticeListProvider =
+    AutoDisposeNotifierProvider<NoticeList, List<Notice>>.internal(
+  NoticeList.new,
+  name: r'noticeListProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$noticeListHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$NoticeList = AutoDisposeNotifier<List<Notice>>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

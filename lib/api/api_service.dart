@@ -7,13 +7,18 @@ import 'api_config.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+/// ApiService 인스턴스를 제공하는 Provider
 final apiServiceProvider = Provider((ref) => ApiService(
       dioClient: ref.watch(dioClientProvider),
       httpClient: ref.watch(httpClientProvider),
     ));
 
-void _logApiCall(String method, String endpoint,
-    {dynamic request, dynamic response}) {
+/// API 호출 로깅을 위한 유틸리티 함수
+/// [method] HTTP 메서드 (GET, POST 등)
+/// [endpoint] API 엔드포인트 경로
+/// [request] 요청 데이터 (선택사항)
+/// [response] 응답 데이터 (선택사항)
+void _logApiCall(String method, String endpoint, {dynamic request, dynamic response}) {
   if (kDebugMode) {
     const encoder = JsonEncoder.withIndent('  ');
     print('\n🌐 API 호출 [$method] $endpoint');
@@ -27,6 +32,7 @@ void _logApiCall(String method, String endpoint,
   }
 }
 
+/// API 통신을 담당하는 서비스 클래스
 class ApiService {
   final DioClient dioClient;
   final HttpClient httpClient;
@@ -36,11 +42,11 @@ class ApiService {
     required this.httpClient,
   });
 
-  // Dio를 사용한 API 호출
-  Future<ApiResponse<Map<String, dynamic>>> loginWithDio({
-    required String username,
-    required String password,
-  }) async {
+  /// Dio를 사용한 로그인 API 호출
+  /// [username] 사용자 아이디
+  /// [password] 사용자 비밀번호
+  /// Returns: 로그인 응답 데이터
+  Future<ApiResponse<Map<String, dynamic>>> loginWithDio({required String username, required String password,}) async {
     return await dioClient.post(
       '/api/auth/login',
       data: {
@@ -50,7 +56,10 @@ class ApiService {
     );
   }
 
-  // HTTP를 사용한 API 호출
+  /// HTTP를 사용한 로그인 API 호출
+  /// [username] 사용자 아이디
+  /// [password] 사용자 비밀번호
+  /// Returns: 로그인 응답 데이터
   Future<ApiResponse<Map<String, dynamic>>> loginWithHttp({
     required String username,
     required String password,
@@ -64,21 +73,30 @@ class ApiService {
     );
   }
 
-  // 제품 목록 조회 (Dio 사용)
+  /// Dio를 사용한 제품 목록 조회 API
+  /// Returns: 제품 목록 데이터
   Future<ApiResponse<List<Map<String, dynamic>>>> getProductsWithDio() async {
     return await dioClient.get('/products');
   }
 
-  // 제품 목록 조회 (HTTP 사용)
+  /// HTTP를 사용한 제품 목록 조회 API
+  /// Returns: 제품 목록 데이터
   Future<ApiResponse<List<Map<String, dynamic>>>> getProductsWithHttp() async {
     return await httpClient.get('/products');
   }
 
-  // 제품 목록 조회 (HTTP 사용)
+  /// HTTP를 사용한 테스트 API 호출
+  /// Returns: 테스트 응답 데이터
   Future<ApiResponse<List<Map<String, dynamic>>>> getTestWithHttp() async {
     return await httpClient.get('/test');
   }
   
+  /// 회원가입 API 호출
+  /// [username] 사용자 아이디
+  /// [password] 사용자 비밀번호
+  /// [name] 사용자 이름
+  /// [email] 사용자 이메일
+  /// Returns: 회원가입 응답 데이터
   static Future<Map<String, dynamic>> register({
     required String username,
     required String password,
@@ -113,6 +131,10 @@ class ApiService {
     }
   }
 
+  /// 로그인 API 호출
+  /// [username] 사용자 아이디
+  /// [password] 사용자 비밀번호
+  /// Returns: 로그인 응답 데이터 (토큰, 사용자 정보 등)
   static Future<Map<String, dynamic>> login({
     required String username,
     required String password,
@@ -145,6 +167,12 @@ class ApiService {
     }
   }
 
+  /// 일반적인 API 요청 처리
+  /// [method] HTTP 메서드 (GET, POST 등)
+  /// [path] API 엔드포인트 경로
+  /// [fromJson] JSON 응답을 객체로 변환하는 함수
+  /// [data] 요청 데이터 (선택사항)
+  /// Returns: API 응답 데이터
   Future<ApiResponse<T>> request<T>({
     required String method,
     required String path,

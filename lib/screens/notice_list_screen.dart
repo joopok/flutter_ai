@@ -12,7 +12,7 @@ final noticeListProvider = FutureProvider.autoDispose<ApiResponse<List<Notice>>>
   final apiService = ref.watch(apiServiceProvider);
   return apiService.request(
     method: 'POST',
-    path: ApiConfig.noticeList,
+    path: ApiConfig.eventList,
     fromJson: (json) => 
       (json['data'] as List).map((item) => Notice.fromJson(item)).toList(),
   );
