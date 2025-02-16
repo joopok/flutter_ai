@@ -10,7 +10,7 @@ import '../api/api_config.dart';
 import '../models/notice.dart';
 import 'dart:math';
 import '../components/custom_end_drawer.dart';
-
+import '../components/custom_bottom_navigation_bar.dart';
 final _random = Random();
 final _imageIds = List.generate(10, (index) => _random.nextInt(1000));
 
@@ -181,6 +181,7 @@ class NoticeListPage extends ConsumerWidget {
           ),
         ),
       ),
+      bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 2),
     );
   }
 }
@@ -222,7 +223,7 @@ class _NoticeItem extends StatelessWidget {
                       title,
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                         color: isDarkMode ? Colors.white : AppColors.darkText,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -253,7 +254,7 @@ class _NoticeItem extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(5),
                 child: CachedNetworkImage(
                   imageUrl: 'https://picsum.photos/id/$imageId/80/80',
                   width: 80,
