@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../components/custom_app_bar.dart';
 
 class WorkplaceScreen extends StatelessWidget {
   const WorkplaceScreen({super.key});
@@ -7,17 +8,12 @@ class WorkplaceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: CustomAppBar(
+        title: '우리직장인 설렘',
+        filePath: 'lib/screens/workplace_screen.dart',
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/favor'),
-        ),
-        title: const Text(
-          '우리직장인 설렘',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
         ),
       ),
       body: SingleChildScrollView(

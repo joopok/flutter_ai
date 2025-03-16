@@ -2,7 +2,7 @@
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authHash() => r'74ab4ee3c0b1db57ba7c5b92e184d23941980c5a';
+String _$authHash() => r'48ab54cc8c5baec9d75b322236d25a6884d57d72';
 
 /// See also [Auth].
 @ProviderFor(Auth)

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../api/api_service.dart';
 import '../utils/format_utils.dart';
+import '../components/custom_app_bar.dart';
+
 class ApiTestScreen extends ConsumerStatefulWidget {
   const ApiTestScreen({super.key});
 
@@ -60,7 +62,7 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
  
   Future<void> _testLogin() async {
     final loginData = {
-      'username': 'testuser2',
+      'username1': 'testuser2',
       'password': 'testuser123',
     };
 
@@ -73,7 +75,7 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
       });
 
       final response = await apiService.loginWithDio(
-        username: loginData['username']!,
+        username1: loginData['username1']!,
         password: loginData['password']!,
       );
 
@@ -101,8 +103,9 @@ class _ApiTestScreenState extends ConsumerState<ApiTestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('API 테스트'),
+      appBar: const CustomAppBar(
+        title: 'API 테스트',
+        filePath: 'lib/screens/api_test_screen.dart',
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

@@ -7,6 +7,8 @@ import '../api/api_config.dart';
 import '../models/api_response.dart';
 import '../components/custom_end_drawer.dart';
 import '../models/notice.dart';
+import '../providers/notice_provider.dart';
+import '../theme/app_colors.dart';
 
 final noticeListProvider = FutureProvider.autoDispose<ApiResponse<List<Notice>>>((ref) {
   final apiService = ref.watch(apiServiceProvider);
@@ -160,69 +162,7 @@ class _NoticeListScreenState extends ConsumerState<NoticeListScreen> {
                     }
 
                     final notice = _displayedNotices[index];
-                    final isImportant = notice.isImportant;
-                    
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Row(
-                        children: [
-                          if (isImportant)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              margin: const EdgeInsets.only(right: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Text(
-                                '중요',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          Expanded(
-                            child: Text(
-                              notice.title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 4),
-                          Text(
-                            notice.content,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            dateFormat.format(notice.createdAt),
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                      onTap: () {
-                        context.push('/notice/${notice.id}');
-                      },
-                    );
+                    return _buildNoticeItem(notice, isDarkMode);
                   },
                 );
               },
@@ -230,6 +170,37 @@ class _NoticeListScreenState extends ConsumerState<NoticeListScreen> {
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildNoticeItem(Notice notice, bool isDarkMode) {
+    final isImportant = notice.isImportant;
+    final dateFormat = DateFormat('yyyy.MM.dd');
+    final formattedDate = notice.createdAt != null 
+        ? dateFormat.format(notice.createdAt!) 
+        : notice.date;
+    
+    return ListTile(
+      title: Text(
+        notice.title,
+        style: TextStyle(
+          color: isDarkMode ? Colors.white : AppColors.darkText,
+          fontWeight: isImportant ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+      subtitle: Text(
+        formattedDate,
+        style: TextStyle(
+          color: isDarkMode ? Colors.white70 : Colors.black54,
+          fontSize: 12,
+        ),
+      ),
+      trailing: Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: isDarkMode ? Colors.white54 : Colors.black45,
+      ),
+      onTap: () => context.push('/notice/${notice.id}'),
     );
   }
 }

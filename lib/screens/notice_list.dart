@@ -11,14 +11,24 @@ import '../models/notice.dart';
 import 'dart:math';
 import '../components/custom_end_drawer.dart';
 import '../components/custom_bottom_navigation_bar.dart';
+import '../components/custom_app_bar.dart';
 final _random = Random();
-final _imageIds = List.generate(10, (index) => _random.nextInt(1000));
+final _imageIds = List.generate(100, (index) => _random.nextInt(1000));
 
 // 페이지당 아이템 수
 const _itemsPerPage = 10;
 
-// 현재 페이지 상태 관리를 위한 provider
-final currentPageProvider = StateProvider<int>((ref) => 0);
+// 현재 로드된 아이템 수를 관리하는 provider
+final loadedItemCountProvider = StateProvider<int>((ref) => _itemsPerPage);
+
+// 로딩 상태를 관리하는 provider
+final isLoadingMoreProvider = StateProvider<bool>((ref) => false);
+
+// 모든 데이터가 로드되었는지 확인하는 provider
+final allItemsLoadedProvider = StateProvider<bool>((ref) => false);
+
+// 새로고침 상태를 관리하는 provider
+final isRefreshingProvider = StateProvider<bool>((ref) => false);
 
 final noticeListProvider =
     FutureProvider.autoDispose<ApiResponse<List<Notice>>>((ref) {
@@ -44,6 +54,8 @@ final noticeListProvider =
               id: 0,
               title: '',
               content: '',
+              date: '날짜 없음',
+              type: '일반',
               createdAt: DateTime.now(),
             );
           }
@@ -51,6 +63,8 @@ final noticeListProvider =
           final id = (item['id'] as num?)?.toInt() ?? 0;
           final title = item['title'] as String? ?? '';
           final content = item['content'] as String? ?? '';
+          final date = item['date'] as String? ?? DateFormat('yyyy.MM.dd').format(DateTime.now());
+          final type = item['type'] as String? ?? '일반';
           final createdAt = item['created_at'] != null
               ? DateTime.parse(item['created_at'] as String)
               : DateTime.now();
@@ -59,6 +73,8 @@ final noticeListProvider =
             id: id,
             title: title,
             content: content,
+            date: date,
+            type: type,
             createdAt: createdAt,
           );
         }).toList();
@@ -69,21 +85,116 @@ final noticeListProvider =
   );
 });
 
-class NoticeListPage extends ConsumerWidget {
+class NoticeListPage extends ConsumerStatefulWidget {
   const NoticeListPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NoticeListPage> createState() => _NoticeListPageState();
+}
+
+class _NoticeListPageState extends ConsumerState<NoticeListPage> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _loadMoreItems();
+    }
+  }
+  
+  Future<void> _loadMoreItems() async {
+    final isLoadingMore = ref.read(isLoadingMoreProvider);
+    final allItemsLoaded = ref.read(allItemsLoadedProvider);
+    if (isLoadingMore || allItemsLoaded) return;
+    
+    final noticeListAsync = ref.read(noticeListProvider);
+    await noticeListAsync.whenData((response) async {
+      final notices = response.data ?? [];
+      final loadedCount = ref.read(loadedItemCountProvider);
+      
+      if (loadedCount < notices.length) {
+        ref.read(isLoadingMoreProvider.notifier).state = true;
+        
+        // 로딩 효과를 위한 지연 (1초)
+        await Future.delayed(const Duration(seconds: 1));
+        
+        if (!mounted) return;
+        // 10개씩 추가 로드
+        final newLoadedCount = loadedCount + _itemsPerPage > notices.length
+            ? notices.length
+            : loadedCount + _itemsPerPage;
+        
+        ref.read(loadedItemCountProvider.notifier).state = newLoadedCount;
+        
+        // 모든 아이템이 로드되었는지 확인
+        if (newLoadedCount >= notices.length) {
+          ref.read(allItemsLoadedProvider.notifier).state = true;
+        }
+        
+        ref.read(isLoadingMoreProvider.notifier).state = false;
+      } else {
+        ref.read(allItemsLoadedProvider.notifier).state = true;
+      }
+    });
+  }
+
+  Future<void> _refreshData() async {
+    try {
+      ref.read(isRefreshingProvider.notifier).state = true;
+      
+      // 새로고침 효과를 위한 지연 (1초)
+      await Future.delayed(const Duration(seconds: 1));
+      
+      if (!mounted) return;
+      
+      // 상태 초기화
+      ref.read(loadedItemCountProvider.notifier).state = _itemsPerPage;
+      ref.read(isLoadingMoreProvider.notifier).state = false;
+      ref.read(allItemsLoadedProvider.notifier).state = false;
+      
+      // 데이터 새로고침
+      await ref.refresh(noticeListProvider.future);
+      
+      ref.read(isRefreshingProvider.notifier).state = false;
+    } catch (e) {
+      ref.read(isRefreshingProvider.notifier).state = false;
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('새로고침 중 오류가 발생했습니다: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final noticeListAsync = ref.watch(noticeListProvider);
     final dateFormat = DateFormat('yyyy.MM.dd');
-    final currentPage = ref.watch(currentPageProvider);
+    final loadedItemCount = ref.watch(loadedItemCountProvider);
+    final isLoadingMore = ref.watch(isLoadingMoreProvider);
+    final allItemsLoaded = ref.watch(allItemsLoadedProvider);
+    final isRefreshing = ref.watch(isRefreshingProvider);
 
     return Scaffold(
       backgroundColor:
           isDarkMode ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(
-        title: const Text('공지사항'),
+      appBar: CustomAppBar(
+        title: '공지사항',
+        filePath: 'lib/screens/notice_list.dart',
         backgroundColor: isDarkMode ? AppColors.darkSurface : Colors.white,
       ),
       endDrawer: const CustomEndDrawer(),
@@ -112,63 +223,69 @@ class NoticeListPage extends ConsumerWidget {
             );
           }
 
-          // 전체 페이지 수 계산
-          final totalPages = (notices.length / _itemsPerPage).ceil();
-          
-          // 현재 페이지의 아이템들
-          final startIndex = currentPage * _itemsPerPage;
-          final endIndex = (startIndex + _itemsPerPage < notices.length) 
-              ? startIndex + _itemsPerPage 
-              : notices.length;
-          final currentPageItems = notices.sublist(startIndex, endIndex);
+          // 현재 로드된 아이템들
+          final visibleItems = notices.take(loadedItemCount).toList();
 
-          return Column(
-            children: [
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () => ref.refresh(noticeListProvider.future),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: currentPageItems.length,
-                    itemBuilder: (context, index) {
-                      final notice = currentPageItems[index];
-                      final imageId = _imageIds[index % _imageIds.length];
-                      return _NoticeItem(
-                        title: notice.title,
-                        content: notice.content,
-                        date: dateFormat.format(notice.createdAt),
-                        isDarkMode: isDarkMode,
-                        onTap: () => context.push('/notice/${notice.id}'),
-                        imageId: imageId,
-                      );
-                    },
-                  ),
-                ),
-              ),
-              // 페이지네이션 컨트롤
-              if (totalPages > 1)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.chevron_left),
-                        onPressed: currentPage > 0
-                            ? () => ref.read(currentPageProvider.notifier).state--
-                            : null,
+          return RefreshIndicator(
+            onRefresh: _refreshData,
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(16),
+              itemCount: visibleItems.length + (isLoadingMore || (!allItemsLoaded && loadedItemCount < notices.length) ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index == visibleItems.length) {
+                  if (isLoadingMore) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            const CircularProgressIndicator(),
+                            const SizedBox(height: 8),
+                            Text(
+                              '더 많은 공지사항 불러오는 중...',
+                              style: TextStyle(
+                                color: isDarkMode ? Colors.white70 : Colors.black54,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      Text('${currentPage + 1} / $totalPages'),
-                      IconButton(
-                        icon: const Icon(Icons.chevron_right),
-                        onPressed: currentPage < totalPages - 1
-                            ? () => ref.read(currentPageProvider.notifier).state++
-                            : null,
+                    );
+                  } else if (allItemsLoaded) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          '모든 공지사항을 확인하셨습니다.',
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white70 : Colors.black54,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-            ],
+                    );
+                  }
+                  return const SizedBox.shrink(); // 로딩도 아니고 완료도 아닌 경우 빈 위젯 반환
+                }
+                
+                final notice = visibleItems[index];
+                final imageId = index < _imageIds.length ? _imageIds[index] : _random.nextInt(1000);
+                final formattedDate = notice.createdAt != null 
+                    ? dateFormat.format(notice.createdAt!) 
+                    : notice.date;
+                
+                return _NoticeItem(
+                  title: notice.title,
+                  content: notice.content,
+                  date: formattedDate,
+                  isDarkMode: isDarkMode,
+                  onTap: () => context.push('/notice/${notice.id}'),
+                  imageId: imageId,
+                );
+              },
+            ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -209,8 +326,12 @@ class _NoticeItem extends StatelessWidget {
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 16),
       color: isDarkMode ? AppColors.darkSurface : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -254,7 +375,7 @@ class _NoticeItem extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               ClipRRect(
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(12),
                 child: CachedNetworkImage(
                   imageUrl: 'https://picsum.photos/id/$imageId/80/80',
                   width: 80,
@@ -272,4 +393,25 @@ class _NoticeItem extends StatelessWidget {
       ),
     );
   }
+}
+
+List<Notice> _getFallbackNotices() {
+  return [
+    Notice(
+      id: 1,
+      title: '[안내] 우리은행 앱 업데이트 안내',
+      content: '더 나은 서비스 제공을 위한 업데이트 안내입니다.',
+      date: '2024.03.20',
+      type: '안내',
+      createdAt: DateTime.now(),
+    ),
+    Notice(
+      id: 2,
+      title: '[이벤트] 신규 가입 고객 이벤트',
+      content: '신규 가입 고객을 위한 특별 이벤트입니다.',
+      date: '2024.03.19',
+      type: '이벤트',
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+  ];
 }

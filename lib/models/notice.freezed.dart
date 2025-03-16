@@ -23,8 +23,10 @@ mixin _$Notice {
   int get id => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  String get date => throw _privateConstructorUsedError;
+  String get type => throw _privateConstructorUsedError;
   bool get isImportant => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this Notice to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -44,8 +46,10 @@ abstract class $NoticeCopyWith<$Res> {
       {int id,
       String title,
       String content,
-      DateTime createdAt,
-      bool isImportant});
+      String date,
+      String type,
+      bool isImportant,
+      DateTime? createdAt});
 }
 
 /// @nodoc
@@ -66,8 +70,10 @@ class _$NoticeCopyWithImpl<$Res, $Val extends Notice>
     Object? id = null,
     Object? title = null,
     Object? content = null,
-    Object? createdAt = null,
+    Object? date = null,
+    Object? type = null,
     Object? isImportant = null,
+    Object? createdAt = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -82,14 +88,22 @@ class _$NoticeCopyWithImpl<$Res, $Val extends Notice>
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+      date: null == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
       isImportant: null == isImportant
           ? _value.isImportant
           : isImportant // ignore: cast_nullable_to_non_nullable
               as bool,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -105,8 +119,10 @@ abstract class _$$NoticeImplCopyWith<$Res> implements $NoticeCopyWith<$Res> {
       {int id,
       String title,
       String content,
-      DateTime createdAt,
-      bool isImportant});
+      String date,
+      String type,
+      bool isImportant,
+      DateTime? createdAt});
 }
 
 /// @nodoc
@@ -125,8 +141,10 @@ class __$$NoticeImplCopyWithImpl<$Res>
     Object? id = null,
     Object? title = null,
     Object? content = null,
-    Object? createdAt = null,
+    Object? date = null,
+    Object? type = null,
     Object? isImportant = null,
+    Object? createdAt = freezed,
   }) {
     return _then(_$NoticeImpl(
       id: null == id
@@ -141,14 +159,22 @@ class __$$NoticeImplCopyWithImpl<$Res>
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+      date: null == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
       isImportant: null == isImportant
           ? _value.isImportant
           : isImportant // ignore: cast_nullable_to_non_nullable
               as bool,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -160,8 +186,10 @@ class _$NoticeImpl implements _Notice {
       {required this.id,
       required this.title,
       required this.content,
-      required this.createdAt,
-      this.isImportant = false});
+      required this.date,
+      required this.type,
+      this.isImportant = false,
+      this.createdAt});
 
   factory _$NoticeImpl.fromJson(Map<String, dynamic> json) =>
       _$$NoticeImplFromJson(json);
@@ -173,14 +201,18 @@ class _$NoticeImpl implements _Notice {
   @override
   final String content;
   @override
-  final DateTime createdAt;
+  final String date;
+  @override
+  final String type;
   @override
   @JsonKey()
   final bool isImportant;
+  @override
+  final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'Notice(id: $id, title: $title, content: $content, createdAt: $createdAt, isImportant: $isImportant)';
+    return 'Notice(id: $id, title: $title, content: $content, date: $date, type: $type, isImportant: $isImportant, createdAt: $createdAt)';
   }
 
   @override
@@ -191,16 +223,18 @@ class _$NoticeImpl implements _Notice {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.content, content) || other.content == content) &&
-            (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt) &&
+            (identical(other.date, date) || other.date == date) &&
+            (identical(other.type, type) || other.type == type) &&
             (identical(other.isImportant, isImportant) ||
-                other.isImportant == isImportant));
+                other.isImportant == isImportant) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, title, content, createdAt, isImportant);
+  int get hashCode => Object.hash(
+      runtimeType, id, title, content, date, type, isImportant, createdAt);
 
   /// Create a copy of Notice
   /// with the given fields replaced by the non-null parameter values.
@@ -223,8 +257,10 @@ abstract class _Notice implements Notice {
       {required final int id,
       required final String title,
       required final String content,
-      required final DateTime createdAt,
-      final bool isImportant}) = _$NoticeImpl;
+      required final String date,
+      required final String type,
+      final bool isImportant,
+      final DateTime? createdAt}) = _$NoticeImpl;
 
   factory _Notice.fromJson(Map<String, dynamic> json) = _$NoticeImpl.fromJson;
 
@@ -235,9 +271,13 @@ abstract class _Notice implements Notice {
   @override
   String get content;
   @override
-  DateTime get createdAt;
+  String get date;
+  @override
+  String get type;
   @override
   bool get isImportant;
+  @override
+  DateTime? get createdAt;
 
   /// Create a copy of Notice
   /// with the given fields replaced by the non-null parameter values.

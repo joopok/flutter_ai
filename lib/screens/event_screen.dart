@@ -6,6 +6,7 @@ import '../utils/format_utils.dart';
 import '../api/api_service.dart';
 import '../api/api_config.dart';
 import '../models/api_response.dart';
+import '../components/custom_app_bar.dart';
 
 final eventListProvider = FutureProvider.autoDispose<ApiResponse<List<Map<String, dynamic>>>>((ref) {
   final apiService = ref.watch(apiServiceProvider);
@@ -55,17 +56,12 @@ class EventScreen extends ConsumerWidget {
     final scrollController = ScrollController();
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CustomAppBar(
+        title: '이벤트',
+        filePath: 'lib/screens/event_screen.dart',
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/favor'),
-        ),
-        title: const Text(
-          '이벤트',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
         ),
       ),
       endDrawer: const CustomEndDrawer(),

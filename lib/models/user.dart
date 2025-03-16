@@ -9,7 +9,7 @@ class User with _$User {
     required int id,
     required String email,
     required String name,
-    required String username,
+    required String username1,
     required String role,
     @Default(null) String? updatedAt,
     @Default(null) String? profileImage,

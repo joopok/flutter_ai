@@ -17,6 +17,7 @@ class ConsumeDetailScreen extends StatelessWidget {
       child: Scaffold(
         appBar: const CustomAppBar(
           title: '전체 소비내역',
+          filePath: 'lib/screens/consume_detail.dart',
         ),
         body: ListView.builder(
           itemCount: 10, // 임시 데이터 개수

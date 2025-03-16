@@ -23,7 +23,7 @@ mixin _$User {
   int get id => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get username => throw _privateConstructorUsedError;
+  String get username1 => throw _privateConstructorUsedError;
   String get role => throw _privateConstructorUsedError;
   String? get updatedAt => throw _privateConstructorUsedError;
   String? get profileImage => throw _privateConstructorUsedError;
@@ -46,7 +46,7 @@ abstract class $UserCopyWith<$Res> {
       {int id,
       String email,
       String name,
-      String username,
+      String username1,
       String role,
       String? updatedAt,
       String? profileImage});
@@ -70,7 +70,7 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? id = null,
     Object? email = null,
     Object? name = null,
-    Object? username = null,
+    Object? username1 = null,
     Object? role = null,
     Object? updatedAt = freezed,
     Object? profileImage = freezed,
@@ -88,9 +88,9 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      username: null == username
-          ? _value.username
-          : username // ignore: cast_nullable_to_non_nullable
+      username1: null == username1
+          ? _value.username1
+          : username1 // ignore: cast_nullable_to_non_nullable
               as String,
       role: null == role
           ? _value.role
@@ -119,7 +119,7 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       {int id,
       String email,
       String name,
-      String username,
+      String username1,
       String role,
       String? updatedAt,
       String? profileImage});
@@ -140,7 +140,7 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? id = null,
     Object? email = null,
     Object? name = null,
-    Object? username = null,
+    Object? username1 = null,
     Object? role = null,
     Object? updatedAt = freezed,
     Object? profileImage = freezed,
@@ -158,9 +158,9 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      username: null == username
-          ? _value.username
-          : username // ignore: cast_nullable_to_non_nullable
+      username1: null == username1
+          ? _value.username1
+          : username1 // ignore: cast_nullable_to_non_nullable
               as String,
       role: null == role
           ? _value.role
@@ -185,7 +185,7 @@ class _$UserImpl implements _User {
       {required this.id,
       required this.email,
       required this.name,
-      required this.username,
+      required this.username1,
       required this.role,
       this.updatedAt = null,
       this.profileImage = null});
@@ -200,7 +200,7 @@ class _$UserImpl implements _User {
   @override
   final String name;
   @override
-  final String username;
+  final String username1;
   @override
   final String role;
   @override
@@ -212,7 +212,7 @@ class _$UserImpl implements _User {
 
   @override
   String toString() {
-    return 'User(id: $id, email: $email, name: $name, username: $username, role: $role, updatedAt: $updatedAt, profileImage: $profileImage)';
+    return 'User(id: $id, email: $email, name: $name, username1: $username1, role: $role, updatedAt: $updatedAt, profileImage: $profileImage)';
   }
 
   @override
@@ -223,8 +223,8 @@ class _$UserImpl implements _User {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.username, username) ||
-                other.username == username) &&
+            (identical(other.username1, username1) ||
+                other.username1 == username1) &&
             (identical(other.role, role) || other.role == role) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
@@ -235,7 +235,7 @@ class _$UserImpl implements _User {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, id, email, name, username, role, updatedAt, profileImage);
+      runtimeType, id, email, name, username1, role, updatedAt, profileImage);
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -258,7 +258,7 @@ abstract class _User implements User {
       {required final int id,
       required final String email,
       required final String name,
-      required final String username,
+      required final String username1,
       required final String role,
       final String? updatedAt,
       final String? profileImage}) = _$UserImpl;
@@ -272,7 +272,7 @@ abstract class _User implements User {
   @override
   String get name;
   @override
-  String get username;
+  String get username1;
   @override
   String get role;
   @override

@@ -1,40 +1,67 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/debug_provider.dart';
+import 'package:path/path.dart' as path;
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
   final String title;
+  final String filePath;
   final List<Widget>? actions;
-
+  final bool automaticallyImplyLeading;
+  final Widget? leading;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  
   const CustomAppBar({
     super.key,
     required this.title,
+    required this.filePath,
     this.actions,
+    this.automaticallyImplyLeading = true,
+    this.leading,
+    this.backgroundColor,
+    this.foregroundColor,
   });
-
+  
   @override
-  Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final debugSettings = ref.watch(debugSettingsProvider);
+    final fileName = path.basename(filePath);
     
     return AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => context.go('/'),
+      title: Row(
+        children: [
+          Flexible(
+            flex: 3,
+            child: Text(
+              title,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          if (debugSettings.showFileName) ...[
+            const SizedBox(width: 8),
+            Flexible(
+              flex: 2,
+              child: Text(
+                '($fileName)',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 178),
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ],
       ),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: isDarkMode ? Colors.white : Colors.black,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
-      elevation: 0,
       actions: actions,
-      toolbarHeight: kToolbarHeight,
-      automaticallyImplyLeading: true,
+      automaticallyImplyLeading: automaticallyImplyLeading,
+      leading: leading,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
     );
   }
-
+  
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 0);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 } 

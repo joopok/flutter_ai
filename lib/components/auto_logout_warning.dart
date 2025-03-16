@@ -33,7 +33,7 @@ class AutoLogoutWarning extends HookConsumerWidget {
 }
 
 class _WarningDialog extends ConsumerWidget {
-  const _WarningDialog({Key? key}) : super(key: key);
+  const _WarningDialog({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

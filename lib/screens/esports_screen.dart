@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../components/custom_app_bar.dart';
 
 class EsportsScreen extends StatelessWidget {
   const EsportsScreen({super.key});
@@ -42,8 +43,9 @@ class EsportsScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('e스포츠관'),
+      appBar: const CustomAppBar(
+        title: 'e스포츠관',
+        filePath: 'lib/screens/esports_screen.dart',
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

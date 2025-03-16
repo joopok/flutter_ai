@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:ui';
+import 'package:flutter/services.dart';
 import '../components/custom_bottom_navigation_bar.dart';
 import '../components/custom_end_drawer.dart';
+import '../components/custom_app_bar.dart';
 import '../components/loading_overlay.dart';
 import '../providers/auth_provider.dart';
+import '../providers/notice_provider.dart';
 import '../theme/app_colors.dart';
-import '../constants/app_constants.dart';
+import '../theme/app_constants.dart';
 import '../components/account_list_bottom_sheet.dart';
+import '../models/notice.dart';
+import '../theme/app_theme.dart';
+import '../api/api_service.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key});
@@ -17,8 +24,6 @@ class MyHomePage extends ConsumerStatefulWidget {
 }
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
-  static const double _kAppBarElevation = 0.5;
-  static const double _kAvatarRadius = 18.0;
   static const double _kQuickActionSize = 56.0;
   static const double _kTransactionIconSize = 40.0;
   static const double _kProductCardWidth = 280.0;
@@ -42,6 +47,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   Future<void> _loadInitialData() async {
     try {
       await _showLoading(() async {
+        await ref.read(noticesProvider.future);
         await Future.delayed(const Duration(milliseconds: 1000));
       }, LoadingType.initializing);
     } catch (e) {
@@ -52,7 +58,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   Future<void> _refreshData() async {
     try {
       await _showLoading(
-        () => Future.delayed(const Duration(seconds: 2)),
+        () async {
+          await ref.refresh(noticesProvider.future);
+          await Future.delayed(const Duration(seconds: 1));
+        },
         LoadingType.refreshing,
       );
     } catch (e) {
@@ -107,13 +116,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 
   PreferredSizeWidget _buildAppBar(bool isDarkMode, UserData? userData) {
-    return AppBar(
+    return CustomAppBar(
+      title: '홈',
+      filePath: 'lib/screens/home.dart',
       backgroundColor: _isScrolled
           ? (isDarkMode ? AppColors.darkSurface : Colors.white)
           : Colors.transparent,
-      elevation: _isScrolled ? _kAppBarElevation : 0,
-      title: _AppBarTitle(userData: userData, isDarkMode: isDarkMode),
       actions: _buildAppBarActions(isDarkMode),
+      automaticallyImplyLeading: false,
     );
   }
 
@@ -148,51 +158,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           ],
         ),
       ),
-    );
-  }
-}
-class _AppBarTitle extends StatelessWidget {
-  const _AppBarTitle({
-    required this.userData,
-    required this.isDarkMode,
-  });
-
-  final UserData? userData;
-  final bool isDarkMode;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: _MyHomePageState._kAvatarRadius,
-          backgroundImage: NetworkImage(
-            userData?.profileImage ?? AppConstants.defaultProfileImage,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '안녕하세요,',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: isDarkMode ? Colors.white : AppColors.darkText,
-              ),
-            ),
-            Text(
-              '${userData?.name ?? '게스트'}님',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: isDarkMode ? Colors.white : AppColors.darkText,
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }
@@ -295,30 +260,61 @@ class _BalanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDarkMode ? AppColors.darkGradient : AppColors.lightGradient,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(26),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          _BalanceHeader(authState: authState),
-          const SizedBox(height: 8),
-          _BalanceAmount(authState: authState),
-          const SizedBox(height: 16),
-          _AccountInfo(),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDarkMode 
+                  ? [
+                      Color(0xFF2C3E50),
+                      Color(0xFF3498DB),
+                    ]
+                  : [
+                      Color(0xFF6DD5ED),
+                      Color(0xFF2193B0),
+                    ],
+              ),
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: isDarkMode 
+                    ? Colors.black.withOpacity(0.3)
+                    : Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _BalanceHeader(authState: authState),
+                  const SizedBox(height: 8),
+                  _BalanceAmount(authState: authState),
+                  const SizedBox(height: 16),
+                  _AccountInfo(),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            right: -30,
+            top: -30,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -500,16 +496,27 @@ class _QuickActionButton extends StatelessWidget {
             width: _MyHomePageState._kQuickActionSize,
             height: _MyHomePageState._kQuickActionSize,
             decoration: BoxDecoration(
-              color: isDarkMode ? AppColors.darkSurface : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color:
-                    isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDarkMode
+                    ? [Color(0xFF2C3E50), Color(0xFF3498DB)]
+                    : [Color(0xFF6DD5ED), Color(0xFF2193B0)],
               ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: isDarkMode
+                      ? Colors.black.withOpacity(0.3)
+                      : Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
             ),
             child: Icon(
               icon,
-              color: isDarkMode ? AppColors.primary : AppColors.secondary,
+              color: Colors.white,
               size: 24,
             ),
           ),
@@ -518,6 +525,7 @@ class _QuickActionButton extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 12,
+              fontWeight: FontWeight.w600,
               color: isDarkMode ? Colors.white : AppColors.darkText,
             ),
           ),
@@ -538,30 +546,45 @@ class _TransactionHistory extends StatelessWidget {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkSurface : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: isDarkMode ? AppColors.darkSurface.withOpacity(0.7) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
+          width: 0.5,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           _TransactionHeader(isDarkMode: isDarkMode),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 5,
-            itemBuilder: (context, index) {
-              final isExpense = index % 2 == 0;
-              return _TransactionItem(
-                date: '2024.03.${20 - index}',
-                title: isExpense ? '스타벅스 강남점' : '급여',
-                amount: isExpense ? '- ₩5,800' : '+ ₩3,500,000',
-                isExpense: isExpense,
-                isDarkMode: isDarkMode,
-              );
-            },
+          const SizedBox(height: 8),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 300),
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
+              itemCount: 5,
+              itemBuilder: (context, index) {
+                final isExpense = index % 2 == 0;
+                return _TransactionItem(
+                  date: '2024.03.${20 - index}',
+                  title: isExpense ? '스타벅스 강남점' : '급여',
+                  amount: isExpense ? '- ₩5,800' : '+ ₩3,500,000',
+                  isExpense: isExpense,
+                  isDarkMode: isDarkMode,
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -758,34 +781,77 @@ class _ProductRecommendations extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '추천 상품',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : AppColors.darkText,
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '추천 상품',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : AppColors.darkText,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  style: TextButton.styleFrom(
+                    foregroundColor: isDarkMode ? AppColors.primary : AppColors.secondary,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        '전체보기',
+                        style: TextStyle(
+                          color: isDarkMode ? AppColors.primary : AppColors.secondary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 12,
+                        color: isDarkMode ? AppColors.primary : AppColors.secondary,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
           SizedBox(
-            height: _MyHomePageState._kProductCardHeight,
+            height: _MyHomePageState._kProductCardHeight + 16,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              children:const [
-                _ProductCard(
-                  title: '우리 급여통장',
-                  description: '급여 고객을 위한\n특별한 혜택',
-                  color: AppColors.primary,
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 16),
+              children: [
+                _buildProductCard(
+                  '우리 급여통장',
+                  '급여 고객을 위한\n특별한 혜택',
+                  AppColors.primary,
+                  Icons.account_balance_wallet,
+                  context,
+                  isDarkMode,
                 ),
-                _ProductCard(
-                  title: '우리 주거래통장',
-                  description: '수수료 면제 혜택으로\n편리한 금융생활',
-                  color: AppColors.secondary,
+                _buildProductCard(
+                  '우리 주거래통장',
+                  '수수료 면제 혜택으로\n편리한 금융생활',
+                  AppColors.secondary,
+                  Icons.credit_card,
+                  context,
+                  isDarkMode,
                 ),
-                _ProductCard(
-                  title: '우리 청년통장',
-                  description: '청년을 위한\n자산형성 프로그램',
-                  color: AppColors.accent,
+                _buildProductCard(
+                  '우리 청년통장',
+                  '청년을 위한\n자산형성 프로그램',
+                  AppColors.accent,
+                  Icons.savings,
+                  context,
+                  isDarkMode,
                 ),
               ],
             ),
@@ -794,15 +860,154 @@ class _ProductRecommendations extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildProductCard(String title, String description, Color color, IconData icon, BuildContext context, bool isDarkMode) {
+    return Container(
+      width: _MyHomePageState._kProductCardWidth,
+      height: _MyHomePageState._kProductCardHeight,
+      margin: const EdgeInsets.only(right: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color,
+            color.withOpacity(0.7),
+          ],
+          stops: const [0.3, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {},
+            splashColor: Colors.white.withOpacity(0.1),
+            highlightColor: Colors.white.withOpacity(0.05),
+            child: Stack(
+              children: [
+                Positioned(
+                  right: -30,
+                  top: -30,
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.1),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: -20,
+                  bottom: -20,
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.05),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 20,
+                  top: 20,
+                  child: Icon(
+                    icon,
+                    size: 32,
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Flexible(
+                        child: Text(
+                          description,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 14,
+                            height: 1.3,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 0.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '자세히 보기',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.95),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.3,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward,
+                              color: Colors.white.withOpacity(0.95),
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _NoticeList extends StatelessWidget {
+class _NoticeList extends ConsumerWidget {
   const _NoticeList({required this.isDarkMode});
 
   final bool isDarkMode;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final noticesAsyncValue = ref.watch(noticesProvider);
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
@@ -812,9 +1017,19 @@ class _NoticeList extends StatelessWidget {
         border: Border.all(
           color: isDarkMode ? AppColors.darkBorder : AppColors.lightBorder,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -838,30 +1053,65 @@ class _NoticeList extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          _NoticeItem(
-            title: '[안내] 우리은행 앱 업데이트 안내',
-            date: '2024.03.20',
-            isDarkMode: isDarkMode,
-            onTap: () => context.push('/notice/1'),
-          ),
-          _NoticeItem(
-            title: '[이벤트] 신규 가입 고객 이벤트',
-            date: '2024.03.19',
-            isDarkMode: isDarkMode,
-            onTap: () => context.push('/notice/2'),
-          ),
-          _NoticeItem(
-            title: '[안내] 시스템 점검 안내',
-            date: '2024.03.18',
-            isDarkMode: isDarkMode,
-            onTap: () => context.push('/notice/3'),
+          const SizedBox(height: 8),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 200),
+            child: noticesAsyncValue.when(
+              data: (notices) {
+                if (notices.isEmpty) {
+                  return Center(
+                    child: Text(
+                      '공지사항이 없습니다.',
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                      ),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: notices.length,
+                  itemBuilder: (context, index) {
+                    final notice = notices[index];
+                    return _NoticeItem(
+                      title: notice.title,
+                      date: notice.date,
+                      isDarkMode: isDarkMode,
+                      onTap: () => context.push('/notice/${notice.id}'),
+                    );
+                  },
+                );
+              },
+              loading: () => const Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                  ),
+                ),
+              ),
+              error: (error, stack) {
+                print('Notice error: $error\n$stack');
+                return Center(
+                  child: Text(
+                    '공지사항을 불러오는데 실패했습니다.',
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black54,
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
     );
   }
 }
+
 
 class _NoticeItem extends StatelessWidget {
   const _NoticeItem({
@@ -914,76 +1164,6 @@ class _NoticeItem extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _ProductCard extends StatelessWidget {
-  const _ProductCard({
-    required this.title,
-    required this.description,
-    required this.color,
-  });
-
-  final String title;
-  final String description;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: _MyHomePageState._kProductCardWidth,
-      margin: const EdgeInsets.only(right: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            color,
-            color.withAlpha(204),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            description,
-            style: TextStyle(
-              color: Colors.white.withAlpha(204),
-              fontSize: 14,
-              height: 1.5,
-            ),
-          ),
-          const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withAlpha(51),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              '자세히 보기',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

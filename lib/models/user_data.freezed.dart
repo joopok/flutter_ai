@@ -22,7 +22,7 @@ UserData _$UserDataFromJson(Map<String, dynamic> json) {
 mixin _$UserData {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get username => throw _privateConstructorUsedError;
+  String get username1 => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
   String get role => throw _privateConstructorUsedError;
   String get updatedAt => throw _privateConstructorUsedError;
@@ -46,7 +46,7 @@ abstract class $UserDataCopyWith<$Res> {
   $Res call(
       {String id,
       String name,
-      String username,
+      String username1,
       String email,
       String role,
       String updatedAt,
@@ -70,7 +70,7 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? username = null,
+    Object? username1 = null,
     Object? email = null,
     Object? role = null,
     Object? updatedAt = null,
@@ -85,9 +85,9 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      username: null == username
-          ? _value.username
-          : username // ignore: cast_nullable_to_non_nullable
+      username1: null == username1
+          ? _value.username1
+          : username1 // ignore: cast_nullable_to_non_nullable
               as String,
       email: null == email
           ? _value.email
@@ -120,7 +120,7 @@ abstract class _$$UserDataImplCopyWith<$Res>
   $Res call(
       {String id,
       String name,
-      String username,
+      String username1,
       String email,
       String role,
       String updatedAt,
@@ -142,7 +142,7 @@ class __$$UserDataImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? username = null,
+    Object? username1 = null,
     Object? email = null,
     Object? role = null,
     Object? updatedAt = null,
@@ -157,9 +157,9 @@ class __$$UserDataImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      username: null == username
-          ? _value.username
-          : username // ignore: cast_nullable_to_non_nullable
+      username1: null == username1
+          ? _value.username1
+          : username1 // ignore: cast_nullable_to_non_nullable
               as String,
       email: null == email
           ? _value.email
@@ -187,7 +187,7 @@ class _$UserDataImpl implements _UserData {
   const _$UserDataImpl(
       {required this.id,
       required this.name,
-      required this.username,
+      required this.username1,
       required this.email,
       required this.role,
       required this.updatedAt,
@@ -201,7 +201,7 @@ class _$UserDataImpl implements _UserData {
   @override
   final String name;
   @override
-  final String username;
+  final String username1;
   @override
   final String email;
   @override
@@ -213,7 +213,7 @@ class _$UserDataImpl implements _UserData {
 
   @override
   String toString() {
-    return 'UserData(id: $id, name: $name, username: $username, email: $email, role: $role, updatedAt: $updatedAt, profileImage: $profileImage)';
+    return 'UserData(id: $id, name: $name, username1: $username1, email: $email, role: $role, updatedAt: $updatedAt, profileImage: $profileImage)';
   }
 
   @override
@@ -223,8 +223,8 @@ class _$UserDataImpl implements _UserData {
             other is _$UserDataImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.username, username) ||
-                other.username == username) &&
+            (identical(other.username1, username1) ||
+                other.username1 == username1) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.role, role) || other.role == role) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -236,7 +236,7 @@ class _$UserDataImpl implements _UserData {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, id, name, username, email, role, updatedAt, profileImage);
+      runtimeType, id, name, username1, email, role, updatedAt, profileImage);
 
   /// Create a copy of UserData
   /// with the given fields replaced by the non-null parameter values.
@@ -258,7 +258,7 @@ abstract class _UserData implements UserData {
   const factory _UserData(
       {required final String id,
       required final String name,
-      required final String username,
+      required final String username1,
       required final String email,
       required final String role,
       required final String updatedAt,
@@ -272,7 +272,7 @@ abstract class _UserData implements UserData {
   @override
   String get name;
   @override
-  String get username;
+  String get username1;
   @override
   String get email;
   @override

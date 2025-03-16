@@ -6,8 +6,12 @@ _$NoticeImpl _$$NoticeImplFromJson(Map<String, dynamic> json) => _$NoticeImpl(
       id: (json['id'] as num).toInt(),
       title: json['title'] as String,
       content: json['content'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      date: json['date'] as String,
+      type: json['type'] as String,
       isImportant: json['isImportant'] as bool? ?? false,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
     );
 
 Map<String, dynamic> _$$NoticeImplToJson(_$NoticeImpl instance) =>
@@ -15,6 +19,8 @@ Map<String, dynamic> _$$NoticeImplToJson(_$NoticeImpl instance) =>
       'id': instance.id,
       'title': instance.title,
       'content': instance.content,
-      'createdAt': instance.createdAt.toIso8601String(),
+      'date': instance.date,
+      'type': instance.type,
       'isImportant': instance.isImportant,
+      'createdAt': instance.createdAt?.toIso8601String(),
     };

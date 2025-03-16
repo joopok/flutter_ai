@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'providers/auth_provider.dart';
 import 'providers/theme_provider.dart';
+import 'providers/debug_provider.dart';
 import 'screens/home.dart';
 import 'screens/asset.dart';
 import 'screens/product.dart';
@@ -140,6 +141,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/app-introduction',
         builder: (context, state) => const AppIntroductionScreen(),
       ),
+      GoRoute(
+        path: '/debug-settings',
+        builder: (context, state) => const DebugSettingsScreen(),
+      ),
     ],
     errorBuilder: (context, state) => const ErrorScreen(),
     redirect: (context, state) {
@@ -226,6 +231,46 @@ class MyApp extends ConsumerWidget {
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+// 디버그 설정 화면
+class DebugSettingsScreen extends ConsumerWidget {
+  const DebugSettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final debugSettings = ref.watch(debugSettingsProvider);
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('디버그 설정'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/home'),
+        ),
+      ),
+      body: ListView(
+        children: [
+          SwitchListTile(
+            title: const Text('화면 타이틀에 파일명 표시'),
+            subtitle: const Text('각 화면의 타이틀 옆에 해당 파일명을 표시합니다.'),
+            value: debugSettings.showFileName,
+            onChanged: (value) {
+              ref.read(debugSettingsProvider.notifier).setShowFileName(value);
+            },
+          ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              '현재 설정: 파일명 표시 ${debugSettings.showFileName ? "켜짐" : "꺼짐"}',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

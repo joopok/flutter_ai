@@ -19,7 +19,7 @@ class UserData with _$UserData {
   const factory UserData({
     required String id,
     required String name,
-    required String username,
+    required String username1,
     required String email,
     required String role,
     required String updatedAt,
@@ -63,12 +63,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> login(String username, String password) async {
+  Future<void> login(String username1, String password) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     
     try {
       final result = await ApiService.login(
-        username: username,
+        username1: username1,
         password: password,
       );
       
@@ -76,7 +76,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         id: 1,
         email: result['email'] ?? '',
         name: result['name'] ?? '',
-        username: result['username'] ?? '',
+        username1: result['username1'] ?? '',
         role: result['role'] ?? 'user',
         updatedAt: DateTime.now().toIso8601String(),
         profileImage: result['profileImage'],
@@ -89,7 +89,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         userData: UserData(
           id: user.id.toString(),
           name: user.name,
-          username: user.username,
+          username1: user.username1,
           email: user.email,
           role: user.role,
           updatedAt: DateTime.now().toIso8601String(),
@@ -137,11 +137,11 @@ class Auth extends _$Auth {
   @override
   AsyncValue<User?> build() => const AsyncValue.data(null);
 
-  Future<void> login(String username, String password) async {
+  Future<void> login(String username1, String password) async {
     state = const AsyncValue.loading();
     try {
       final result = await ApiService.login(
-        username: username,
+        username1: username1,
         password: password,
       );
       
@@ -149,7 +149,7 @@ class Auth extends _$Auth {
         id: 1,
         email: result['email'] ?? '',
         name: result['name'] ?? '',
-        username: result['username'] ?? '',
+        username1: result['username1'] ?? '',
         role: result['role'] ?? 'user',
         updatedAt: DateTime.now().toIso8601String(),
         profileImage: result['profileImage'],

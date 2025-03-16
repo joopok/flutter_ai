@@ -9,16 +9,11 @@ class Notice with _$Notice {
     required int id,
     required String title,
     required String content,
-    required DateTime createdAt,
+    required String date,
+    required String type,
     @Default(false) bool isImportant,
+    DateTime? createdAt,
   }) = _Notice;
 
-  factory Notice.fromJson(Map<String, dynamic> json) => 
-    _$NoticeFromJson({
-      'id': json['noticeId'],
-      'title': json['title'],
-      'content': json['content'],
-      'createdAt': json['created_at'],
-      'isImportant': json['isImportant'] ?? false,
-    });
+  factory Notice.fromJson(Map<String, dynamic> json) => _$NoticeFromJson(json);
 } 

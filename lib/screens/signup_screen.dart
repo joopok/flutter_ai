@@ -28,7 +28,7 @@ class _SignupScreenState extends State<SignupScreen> {
       final response = await dio.post(
         '${ApiConfig.baseUrl}/api/auth/register',
         data: {
-          'username': _idController.text,
+          'username1': _idController.text,
           'password': _passwordController.text,
           'email': _emailController.text,
           'name': _nameController.text,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../components/custom_bottom_navigation_bar.dart';
 import '../components/custom_end_drawer.dart';
+import '../components/custom_app_bar.dart';
 
 class BenefitScreen extends StatefulWidget {
   const BenefitScreen({super.key});
@@ -17,21 +18,14 @@ class BenefitScreenState extends State<BenefitScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
+      appBar: CustomAppBar(
+        title: '혜택',
+        filePath: 'lib/screens/benefit.dart',
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back,
             color: isDarkMode ? Colors.white : Colors.black87),
           onPressed: () => context.go('/'),
-        ),
-        title: Text(
-          '혜택',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black87,
-          ),
         ),
       ),
       endDrawer: const CustomEndDrawer(),

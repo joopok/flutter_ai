@@ -39,7 +39,7 @@
     },
     {
       "name": "async",
-      "rootUri": "file:///Users/doseunghyeon/.pub-cache/hosted/pub.dev/async-2.12.0",
+      "rootUri": "file:///Users/doseunghyeon/.pub-cache/hosted/pub.dev/async-2.13.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -872,10 +872,10 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-02-15T18:13:16.283802Z",
+  "generated": "2025-03-16T09:30:30.677684Z",
   "generator": "pub",
-  "generatorVersion": "3.8.0-70.0.dev",
+  "generatorVersion": "3.8.0-196.0.dev",
   "flutterRoot": "file:///Users/doseunghyeon/development/flutter",
-  "flutterVersion": "3.29.0-1.0.pre.309",
+  "flutterVersion": "3.31.0-1.0.pre.83",
   "pubCache": "file:///Users/doseunghyeon/.pub-cache"
 }

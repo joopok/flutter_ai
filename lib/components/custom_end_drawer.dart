@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/theme_provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/debug_provider.dart';
 import '../theme/app_colors.dart';
 import 'custom_confirm_alert.dart';
 
@@ -222,6 +223,30 @@ class CustomEndDrawer extends ConsumerWidget {
               leading: const Icon(Icons.info_outline),
               title: const Text('앱 소개'),
               onTap: () => context.push('/app-introduction'),
+            ),
+            ListTile(
+              leading: Icon(Icons.bug_report,
+                  color: isDarkMode ? Colors.white : Colors.black87),
+              title: Text('디버그 설정',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  )),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/debug-settings');
+              },
+              trailing: Consumer(
+                builder: (context, ref, child) {
+                  final debugSettings = ref.watch(debugSettingsProvider);
+                  return Switch(
+                    value: debugSettings.showFileName,
+                    onChanged: (value) {
+                      ref.read(debugSettingsProvider.notifier).setShowFileName(value);
+                    },
+                    activeColor: isDarkMode ? AppColors.primary : AppColors.secondary,
+                  );
+                },
+              ),
             ),
             ListTile(
               leading: Icon(Icons.logout,

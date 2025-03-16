@@ -40,7 +40,6 @@ class AccountNotifier extends _$AccountNotifier {
   }
 
   Future<void> refreshAccounts() async {
-    // TODO: API 호출로 실제 계좌 정보 갱신
     await Future.delayed(const Duration(seconds: 1));
   }
 }
@@ -62,7 +61,6 @@ class TransactionNotifier extends _$TransactionNotifier {
   }
 
   Future<void> refreshTransactions() async {
-    // TODO: API 호출로 실제 거래내역 갱신
     await Future.delayed(const Duration(seconds: 1));
   }
 } 

@@ -8,7 +8,7 @@ class UserData with _$UserData {
   const factory UserData({
     required String id,
     required String name,
-    required String username,
+    required String username1,
     required String email,
     required String role,
     required String updatedAt,
